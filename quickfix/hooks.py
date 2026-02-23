@@ -5,9 +5,15 @@ app_description = "It a task"
 app_email = "praveensekar223@gmail.com"
 app_license = "mit"
 
-# Apps
-# ------------------
+fixtures = [
+    {'dt':'Device Type',
+      "filters":[
+            ['name', "in",["Smartphone","Laptop","Tablet"]]
+        ]
+    }
+]
 
+# Ap
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
