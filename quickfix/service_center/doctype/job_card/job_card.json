@@ -181,7 +181,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
-   "options": "Draft\nPending\nDiagnosis\nAwaiting Customer Approval\nIn Repair\nReady\nFor Delivery\nDelivered\nCancelled"
+   "options": "Draft\nPending\nDiagnosis\nAwaiting Customer Approval\nIn Repair\nReady For Delivery\nDelivered\nCancelled"
   },
   {
    "fieldname": "part_used_section",
@@ -212,7 +212,7 @@
    "link_fieldname": "device_type"
   }
  ],
- "modified": "2026-02-24 15:19:10.528676",
+ "modified": "2026-02-24 20:58:59.204529",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Job Card",

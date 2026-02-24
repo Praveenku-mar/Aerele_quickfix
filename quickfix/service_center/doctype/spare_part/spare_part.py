@@ -10,7 +10,7 @@ class SparePart(Document):
 	def autoname(self):
 		part_code = (self.part_code).upper()
 		count = frappe.db.count("Spare Part")
-		self.name = f"{part_code}-PART-{datetime.now().year}-{count + 1}"
+		self.name = f"{part_code}-PART-{datetime.now().year}-{count + 1:04d}"
 
 	def validate(self):
 		if self.selling_price <= self.unit_cost:
