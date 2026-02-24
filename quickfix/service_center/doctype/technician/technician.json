@@ -89,9 +89,9 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-24 13:22:15.479605",
+ "modified": "2026-02-24 13:22:21.520854",
  "modified_by": "Administrator",
- "module": "QuickFix",
+ "module": "Service Center",
  "name": "Technician",
  "owner": "Administrator",
  "permissions": [
