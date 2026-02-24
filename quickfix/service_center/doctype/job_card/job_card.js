@@ -35,7 +35,7 @@ function calculate_row_total(frm, cdt, cdn) {
 }
 
 function calculate_total_amount(frm) {
-    let parts_total = 0;
+    let  parts_total = 0;
 
     (frm.doc.parts_used || []).forEach(d => {
         parts_total += d.total_price || 0
