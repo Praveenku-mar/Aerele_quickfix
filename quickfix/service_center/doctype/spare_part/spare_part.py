@@ -16,4 +16,10 @@ class SparePart(Document):
 		if self.selling_price <= self.unit_cost:
 			frappe.throw("Selling Price must be greater than the Unit Cost")
 
+
+	def on_update(self):
+		threshold = frappe.db.get_value("Quickfix Settings",None,"low_stock_threshold")
+		# I prefer this; it’s optimal. Instead of fetching the full document, it retrieves only a single value.
+
+
 	

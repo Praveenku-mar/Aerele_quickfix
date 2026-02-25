@@ -1,0 +1,29 @@
+[
+ {
+  "average_repair_hours": 24,
+  "description": "A smartphone is a mobile device that combines the functionality of a traditional mobile phone with advanced computing capabilities, effectively serving as a handheld computer.",
+  "device_type": "Smartphone",
+  "docstatus": 0,
+  "doctype": "Device Type",
+  "modified": "2026-02-23 17:53:23.136198",
+  "name": "Smartphone"
+ },
+ {
+  "average_repair_hours": 48,
+  "description": "A laptop is a portable personal computer designed for mobile use, integrating all essential components—such as a display, keyboard, touchpad, battery, and speakers—into a single compact, clamshell-shaped unit.",
+  "device_type": "Laptop",
+  "docstatus": 0,
+  "doctype": "Device Type",
+  "modified": "2026-02-23 17:54:06.715213",
+  "name": "Laptop"
+ },
+ {
+  "average_repair_hours": 24,
+  "description": "A tablet is a portable, wireless computing device with a touchscreen interface, typically ranging from 7 to 12 inches in screen size. ",
+  "device_type": "Tablet",
+  "docstatus": 0,
+  "doctype": "Device Type",
+  "modified": "2026-02-23 17:56:22.732816",
+  "name": "Tablet"
+ }
+]

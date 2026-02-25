@@ -124,3 +124,24 @@ If you only need to modify fields on the same document:
 ```python
 def validate(self):
     self.total = self.qty * self.rate
+
+---
+
+12 .What is the issue with using `frappe.get_all()` inside a whitelisted method exposed to guests or low-privilege users, especially regarding `permission_query_conditions`?
+
+`frappe.get_all()` ignores user permissions by default.  
+It does not apply `permission_query_conditions` defined for the DocType.  
+If exposed in a guest-accessible or low-privilege whitelisted method, it can return data the user should not see.  
+
+---
+
+13. Why is `doc_events` safer than `override_doctype_class` for most use cases?
+
+`doc_events` attaches logic to specific lifecycle hooks without replacing the core DocType class.  
+It keeps the standard behavior intact and only adds extra logic where needed.  
+
+`override_doctype_class` completely replaces the original class.  
+If you miss internal logic from the base class, you can break validations, permissions, or workflows.  
+
+`doc_events` is additive and low risk.  
+`override_doctype_class` is invasive and easier to misuse.
