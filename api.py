@@ -133,6 +133,24 @@ def send_job_ready_email(job_card):
     frappe.sendmail(
         recipients=[doc.customer_email],
         subject=f"Job {doc.name} is Ready for Delivery",
-        message=html
+        message=html,
+        now=True
     )
 
+@frappe.whitelist()
+def share_job_card(job_card_name,user_email):
+    frappe.share.add(
+        "Job Card",
+        job_card_name,
+        user_email,
+        read=1,
+        write=0,
+        share=0
+    )
+
+    return "Successfully Shared"
+
+@frappe.whitelist()
+def manager_only_action():
+    frappe.only_for("QF Manager")
+    return "Access Granted. Manager action executed."

@@ -10,6 +10,12 @@ fixtures = [
       "filters":[
             ['name', "in",["Smartphone","Laptop","Tablet"]]
         ]
+    },
+    {
+    'dt': "Role",
+    "filters": [
+        ["name","in",["QF Service Staff","QF Technician","QF Manager"]]
+    ]
     }
 ]
 
@@ -123,10 +129,10 @@ fixtures = [
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
-#
+permission_query_conditions = {
+    "Job Card": "quickfix.service_center.doctype.job_card.job_card.check_access_permission",
+}
+
 # has_permission = {
 # 	"Event": "frappe.desk.doctype.event.event.has_permission",
 # }

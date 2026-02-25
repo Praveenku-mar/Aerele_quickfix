@@ -28,6 +28,7 @@
    "fieldname": "technician_name",
    "fieldtype": "Data",
    "in_list_view": 1,
+   "in_preview": 1,
    "label": "Technician Name",
    "reqd": 1
   },
@@ -89,7 +90,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-24 13:22:21.520854",
+ "modified": "2026-02-25 11:06:46.248747",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Technician",
@@ -132,7 +133,9 @@
  ],
  "row_format": "Dynamic",
  "rows_threshold_for_grid_search": 20,
+ "show_preview_popup": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "technician_name"
 }

@@ -26,6 +26,7 @@ class JobCard(Document):
 	def on_cancel(self):
 		self.status = "Cancelled"
 		self.roll_back_parts()
+		self.cancel_invoice()
 
 
 
@@ -72,7 +73,7 @@ class JobCard(Document):
 	def stock_update(self):
 		for row in self.parts_used:
 			aval_qty = frappe.db.get_value("Spare Part",row.part,"stock_qty")
-			frappe.db.set_value("Spare Part",row.part,"stock_qty",aval_qty - row.quantity,ignore_permissions=True)
+			frappe.db.set_value("Spare Part",row.part,"stock_qty",aval_qty - row.quantity)
 
 	
 	def create_invoice(self):
@@ -81,7 +82,7 @@ class JobCard(Document):
 		invoice.invoice_date = datetime.now()
 		invoice.labour_charge = self.labour_charge
 		invoice.parts_total = self.parts_total
-		invoice.final_amount = self.final_amount
+		invoice.total_amount = self.final_amount
 		invoice.payment_status = "Unpaid"
 		invoice.insert(ignore_permissions=True)
 
@@ -89,11 +90,11 @@ class JobCard(Document):
 		frappe.publish_realtime(
 			"job_ready",
 			message={
-				"job_card":self.name,
+				# "job_card":self.name,
 				"status":"Completed",
-				"message":f"Job Card {self.name} is ready for delivery."
+				# "message":f"Job Card {self.name} is ready for delivery."
 			},
-			user=frappe.session.user
+			# user=frappe.session.user
 		)
 
 	def send_job_ready_mail(self):
@@ -115,3 +116,26 @@ class JobCard(Document):
 	
 
 	
+def check_access_permission(user):
+	if user == "Administrator":
+		return ""
+	if "QF Technician" in frappe.get_roles(user):
+		technician_name = frappe.db.exists(
+			"Technician",
+			{"user": user}
+		)
+		if technician_name:
+			return f"""
+				`tabJob Card`.assigned_technician IN (
+					SELECT name FROM `tabTechnician`
+				WHERE user = {frappe.db.escape(user)}
+			)
+			"""
+		return "1=0"
+
+
+
+
+    
+
+    
