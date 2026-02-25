@@ -28,8 +28,8 @@
 // function calculate_row_total(frm, cdt, cdn) {
 //     const row = locals[cdt][cdn]
 
-//     row.total_price = (row.quantity || 0) * (row.unit_price || 0)
-
+//     total_price = (row.quantity || 0) * (row.unit_price || 0)
+//     frappe.model.set_value(cdt,cdn,"total",total_price)
 //     frm.refresh_field("parts_used")
 //     calculate_total_amount(frm)
 // }

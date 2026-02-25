@@ -38,7 +38,7 @@
   {
    "fieldname": "section_break_kdrn",
    "fieldtype": "Section Break",
-   "label": "Customer and Device"
+   "label": "Customer & Device"
   },
   {
    "fieldname": "amended_from",
@@ -101,7 +101,7 @@
   {
    "fieldname": "assignment_and_diagnosis_section",
    "fieldtype": "Section Break",
-   "label": "Assignment and Diagnosis"
+   "label": "Assignment & Diagnosis"
   },
   {
    "fieldname": "assigned_technician",
@@ -136,7 +136,7 @@
   {
    "fieldname": "financials_and_delivery_section",
    "fieldtype": "Section Break",
-   "label": "Financials and Delivery"
+   "label": "Financials & Delivery"
   },
   {
    "fieldname": "parts_total",
@@ -206,13 +206,8 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
- "links": [
-  {
-   "link_doctype": "Device Type",
-   "link_fieldname": "device_type"
-  }
- ],
- "modified": "2026-02-25 11:30:52.731819",
+ "links": [],
+ "modified": "2026-02-25 16:35:08.718620",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Job Card",

@@ -133,17 +133,19 @@ permission_query_conditions = {
     "Job Card": "quickfix.service_center.doctype.job_card.job_card.check_access_permission",
 }
 
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+has_permission = {
+	# "Event": "frappe.desk.doctype.event.event.has_permission",
+    "Job Card":"quickfix.service_center.doctype.service_invoice.service_invoice.check_has_permission"
+}
 
 # DocType Class
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+	# "ToDo": "custom_app.overrides.CustomToDo"
+    "Job Card":"quickfix.overrides.custom_job_card.CustomJobCard"
+}
 
 # Document Events
 # ---------------

@@ -154,3 +154,25 @@ def share_job_card(job_card_name,user_email):
 def manager_only_action():
     frappe.only_for("QF Manager")
     return "Access Granted. Manager action executed."
+
+
+@frappe.whitelist()
+def get_job_card_unsafe():
+    return frappe.get_all("Job Card",fields=["*"])
+
+
+@frappe.whitelist()
+def get_job_card_safe():
+    user = frappe.session.user
+    role = frappe.get_roles(user)
+
+    data = frappe.get_list("Job Card",
+        fields=["name","customer_name","customer_phone","customer_email","assigned_technician","status","total_amount"]
+    )
+
+    if "QF Manager" not in role:
+        for row in data:
+            row.pop("customer_phone",None)
+            row.pop("customer_email", None)
+    
+    return data

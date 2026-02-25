@@ -28,7 +28,9 @@ class JobCard(Document):
 		self.roll_back_parts()
 		self.cancel_invoice()
 
-
+	def on_trash(self):
+		if self.status != "Cancelled" and self.status != "Draft":
+			frappe.throw("You can only delete Draft or Cancelled Job Cards.")
 
 	#Validate Hook
 	def validate_phone(self):
@@ -107,11 +109,17 @@ class JobCard(Document):
 		)
 
 	#On cancel Hook
-
 	def roll_back_parts(self):
 		for row in self.parts_used:
 			aval_qty = frappe.db.get_value("Spare Part",row.part,"stock_qty")
 			frappe.db.set_value("Spare Part",row.part,"stock_qty",aval_qty + row.quantity)
+
+	def cancel_invoice(self):
+		in_name = frappe.db.get_value("Service Invoice",{"job_card":self.name},"name")
+		invoice = frappe.get_doc("Service Invoice",{"job_card":in_name})
+		if invoice:
+			invoice.cancel()
+		
 
 	
 

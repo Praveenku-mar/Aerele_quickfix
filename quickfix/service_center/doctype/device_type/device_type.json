@@ -39,8 +39,13 @@
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2026-02-24 13:22:56.697025",
+ "links": [
+  {
+   "link_doctype": "Job Card",
+   "link_fieldname": "device_type"
+  }
+ ],
+ "modified": "2026-02-25 16:36:07.724676",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Device Type",

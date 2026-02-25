@@ -108,3 +108,19 @@ Unique constraint is strict and safe.
 Using `frappe.db.exists()` in `validate()` is only an application-level check.  
 It can fail under race conditions because two requests can pass validation before either is saved.  
 `frappe.db.exists()` is weaker and not reliable for true uniqueness.
+---
+
+11. Call self.save() inside on_update and see to the issues of it and explain them in the same readme_internals. Correct the pattern and explain it.
+
+
+If you call `self.save()` inside `on_update`, it causes infinite recursion.  
+Flow is: `save()` → `on_update()` → `save()` → `on_update()` → repeats.  
+This continues until the request crashes or hits recursion limits.  
+It also creates unnecessary DB writes and performance issues.
+
+## correct version:
+If you only need to modify fields on the same document:
+
+```python
+def validate(self):
+    self.total = self.qty * self.rate
