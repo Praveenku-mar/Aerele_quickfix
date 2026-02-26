@@ -25,6 +25,8 @@ fixtures = [
     }
 ]
 
+extend_bootinfo = "quickfix.extend_bootinfo.extend_bootinfo"
+
 # Ap
 # required_apps = []
 
@@ -44,7 +46,7 @@ fixtures = [
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/quickfix/css/quickfix.css"
-# app_include_js = "/assets/quickfix/js/quickfix.js"
+app_include_js = "/assets/quickfix/js/quickfix.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/quickfix/css/quickfix.css"
