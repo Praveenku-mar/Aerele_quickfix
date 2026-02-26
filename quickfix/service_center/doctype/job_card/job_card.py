@@ -39,8 +39,8 @@ class JobCard(Document):
 			frappe.throw("Customer phone number must contain exactly 10 digits.")
 
 	def check_assign_tech(self):
-		req_satuts = ["In Repair","Ready For Delivery","Delivered","Cancelled"]
-		if self.status in req_satuts and not self.assigned_technician:
+		req_status = ["In Repair","Ready For Delivery","Delivered","Cancelled"]
+		if self.status in req_status and not self.assigned_technician:
 			frappe.throw("Assigned Technician is mandatory for this status.")
 
 	def set_total_part_cost(self):

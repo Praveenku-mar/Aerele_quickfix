@@ -4,8 +4,8 @@ from frappe.utils import now
 def log_change(doc, method):
     # if doc.doctype == "Audit Log":
     #     return  
-    doc = ['Technician','Device Type','Spare Part','Job Card','QuickFix Settings','Service Invoice',"Part Usage Entry"]
-    if doc.doctype in doc:
+    doctype = ['Technician','Device Type','Spare Part','Job Card','QuickFix Settings','Service Invoice',"Part Usage Entry"]
+    if doc.doctype in doctype:
         audit = frappe.new_doc("Audit Log")
         audit.doctype_name = doc.doctype
         audit.document_id = doc.name
@@ -16,10 +16,11 @@ def log_change(doc, method):
 
 
 def log_login(login_manager):
+    doc = frappe.get_last_doc("Activity Log")
     frappe.get_doc({
         "doctype": "Audit Log",
-        "doctype_name": "User",
-        "document_id": frappe.session.sid,
+        "doctype_name": "Activity Log",
+        "document_id": doc.name,
         "action": "Login",
         "user": frappe.session.user,
         "timestamp": now()
@@ -27,10 +28,11 @@ def log_login(login_manager):
 
 
 def log_logout(login_manager=None):
+    doc = frappe.get_last_doc("Activity Log")
     frappe.get_doc({
         "doctype": "Audit Log",
-        "doctype_name": "User",
-        "document_id": frappe.session.sid,
+        "doctype_name": "Activity Log",
+        "document_id": doc.name,
         "action": "Logout",
         "user": frappe.session.user,
         "timestamp": now()

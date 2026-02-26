@@ -27,6 +27,10 @@ fixtures = [
 
 extend_bootinfo = "quickfix.extend_bootinfo.extend_bootinfo"
 
+on_session_creation = "quickfix.audit.log_login"
+on_logout = "quick.audit.log_logout"
+
+
 # Ap
 # required_apps = []
 
@@ -94,10 +98,10 @@ app_include_js = "/assets/quickfix/js/quickfix.js"
 # ----------
 
 # add methods and filters to jinja environment
-# jinja = {
-# 	"methods": "quickfix.utils.jinja_methods",
-# 	"filters": "quickfix.utils.jinja_filters"
-# }
+jinja = {
+	"methods": "quickfix.utils.get_shop_name",
+	"filters": "quickfix.utils.format_job_id"
+}
 
 # Installation
 # ------------
@@ -273,4 +277,15 @@ doc_events = {
 # ------------
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
+
+# website_route_rules = [
+# 	{"from_route": "/track-job", "to_route": "Job Card"},
+#     {"from_route": "/track-job/<path:name>", "to_route": "www/track-job.py"}
+# ]
+
+website_route_rules = [
+    {"from_route": "/track-job", "to_route": "Job Card"}
+]
+
+
 
