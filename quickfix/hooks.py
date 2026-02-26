@@ -16,6 +16,12 @@ fixtures = [
     "filters": [
         ["name","in",["QF Service Staff","QF Technician","QF Manager"]]
     ]
+    },
+    {
+        "dt":"DocPerm",
+        "filters":[
+            ["parent","in",["Job Card","Technician","Device Type","Service Invoice","Spare Part"]]
+        ]
     }
 ]
 
@@ -95,7 +101,7 @@ fixtures = [
 # ------------
 
 # before_install = "quickfix.install.before_install"
-# after_install = "quickfix.install.after_install"
+after_install = "quickfix.install.after_install"
 
 # Uninstallation
 # ------------
@@ -152,7 +158,11 @@ override_doctype_class = {
 # Hook on document methods and events
 
 doc_events = {
+    # "Job Card":{
+    #     "on_validate":"quickfix.audit.log_change"
+    # },
     "*" :{
+        "on_validate":"quickfix.audit.log_change",
         "on_update": "quickfix.audit.log_change",
         "on_submit": "quickfix.audit.log_change",
         "on_cancel": "quickfix.audit.log_change"

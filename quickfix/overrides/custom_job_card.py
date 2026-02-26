@@ -34,3 +34,28 @@ class CustomJobCard(JobCard):
 # sending notifications, or running extra logic during lifecycle events.
 # Prefer doc_events unless a complete behavioral override is absolutely necessary.
 
+def after_app_install():
+    data = [
+        {
+         "average_repair_hours": 24,
+         "description": "A smartphone is a mobile device that combines the functionality of a traditional mobile phone with advanced computing capabilities, effectively serving as a handheld computer.",
+         "device_type": "Smartphone",
+        },
+        {
+         "average_repair_hours": 48,
+         "description": "A laptop is a portable personal computer designed for mobile use, integrating all essential components—such as a display, keyboard, touchpad, battery, and speakers—into a single compact, clamshell-shaped unit.",
+         "device_type": "Laptop",
+        },
+        {
+         "average_repair_hours": 24,
+         "description": "A tablet is a portable, wireless computing device with a touchscreen interface, typically ranging from 7 to 12 inches in screen size. ",
+         "device_type": "Tablet",
+        }
+    ] 
+    for row in data:
+        if not frappe.get_doc("Device Type",row.device_type):
+            device = frappe.new_doc("Device Type")
+            device.device_type = row.device_type
+            device.description = row.description
+            device.average_repair_hours = row.average_repair_hours
+            device.insert(ignore_permissions=True)      
