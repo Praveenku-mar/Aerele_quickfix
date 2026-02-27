@@ -178,3 +178,13 @@ def get_job_cards_safe():
 			row.pop("customer_email", None)
 
 	return rows
+
+
+@frappe.whitelist()
+def custom_get_count(doctype,filters=None, debug=False, cache=False):
+	frappe.get_doc({"doctype":"Audit Log",
+	"doctype_name":doctype,
+	"action":"count_queried",
+	"user":frappe.session.user}).insert(ignore_permissions=True)
+	from frappe.client import get_count
+	return get_count(doctype, filters, debug, cache)

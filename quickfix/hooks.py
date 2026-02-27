@@ -28,7 +28,7 @@ fixtures = [
 extend_bootinfo = "quickfix.extend_bootinfo.extend_bootinfo"
 
 on_session_creation = "quickfix.audit.log_login"
-on_logout = "quick.audit.log_logout"
+on_logout = "quickfix.audit.log_logout"
 
 
 # Ap
@@ -141,14 +141,14 @@ before_uninstall = "quickfix.install.before_uninstall"
 # -----------
 # Permissions evaluated in scripted ways
 
-permission_query_conditions = {
-    "Job Card": "quickfix.service_center.doctype.job_card.job_card.check_access_permission",
-}
+# permission_query_conditions = {
+#     "Job Card": "quickfix.service_center.doctype.job_card.job_card.check_access_permission",
+# }
 
-has_permission = {
-	# "Event": "frappe.desk.doctype.event.event.has_permission",
-    "Job Card":"quickfix.service_center.doctype.service_invoice.service_invoice.check_has_permission"
-}
+# has_permission = {
+# 	# "Event": "frappe.desk.doctype.event.event.has_permission",
+#     "Job Card":"quickfix.service_center.doctype.service_invoice.service_invoice.check_has_permission"
+# }
 
 # DocType Class
 # ---------------
@@ -205,9 +205,10 @@ doc_events = {
 # Overriding Methods
 # ------------------------------
 #
-# override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "quickfix.event.get_events"
-# }
+override_whitelisted_methods = {
+	# "frappe.desk.doctype.event.event.get_events": "quickfix.event.get_events"
+    "frappe.client.get_count":"quickfix.api.custom_get_count"
+}
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
@@ -278,14 +279,17 @@ doc_events = {
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
 
-# website_route_rules = [
-# 	{"from_route": "/track-job", "to_route": "Job Card"},
-#     {"from_route": "/track-job/<path:name>", "to_route": "www/track-job.py"}
-# ]
+
 
 website_route_rules = [
-    {"from_route": "/track-job", "to_route": "Job Card"}
+    {"from_route": "/track-job", "to_route": "track-job"}
 ]
 
-
-
+standard_portal_menu_items = [
+    {
+        "title": "Track My Job",
+        "route": "/track-job",
+        "reference_doctype": "Job Card",
+        "role": "Guest"
+    }
+]
