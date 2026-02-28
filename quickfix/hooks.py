@@ -22,7 +22,11 @@ fixtures = [
         "filters":[
             ["parent","in",["Job Card","Technician","Device Type","Service Invoice","Spare Part"]]
         ]
-    }
+    },
+    {"dt":"Custom Field"},
+    {"dt":"Property Setter"},
+    {"dt":"Workspace"},
+    {"dt":"QuickFix Settings"}
 ]
 
 extend_bootinfo = "quickfix.extend_bootinfo.extend_bootinfo"
@@ -137,7 +141,7 @@ before_uninstall = "quickfix.install.before_uninstall"
 
 # notification_config = "quickfix.notifications.get_notification_config"
 
-# Permissions
+# Permission
 # -----------
 # Permissions evaluated in scripted ways
 
