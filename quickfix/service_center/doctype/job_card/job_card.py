@@ -163,11 +163,3 @@ def check_technician(device_type,technician):
 
 	if not exits:
 		frappe.show_alert("Technician Specialization doesn't match with device type.")
-
-
-
-
-
-    
-
-    
