@@ -141,6 +141,28 @@ def check_access_permission(user):
 			"""
 		return "1=0"
 
+@frappe.whitelist()
+def get_technician(device_type):
+	return frappe.get_all(
+		"Technician",
+		filters={
+			"specialization":device_type,
+			"status":"Active"
+		},pluck="name"
+	)
+
+@frappe.whitelist()
+def check_technician(device_type,technician):
+	exits = frappe.db.exists("Technician",
+		filters={
+			"name":technician,
+			"specialization":device_type,
+			"status":"Active"
+		}
+	)
+
+	if not exits:
+		frappe.show_alert("Technician Specialization doesn't match with device type.")
 
 
 
