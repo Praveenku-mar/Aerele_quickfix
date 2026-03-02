@@ -1,5 +1,6 @@
 import frappe
 from frappe import _
+from frappe.custom.doctype.property_setter.property_setter import make_property_setter
 
 def after_app_install():
     data = [
@@ -38,7 +39,7 @@ def after_app_install():
     settings.low_stock_threshold = 5
     settings.low_stock_alert_enable = 1
     settings.save(ignore_permissions=True)
-
+    set_property()
     print("Successfully Executed after_app_install hook")
 
 
@@ -55,3 +56,13 @@ def before_uninstall():
         )
 
 
+def set_property():
+    ps = make_property_setter(
+            doctype="Job Card",
+            fieldname="remarks",
+            property="bold",
+            value=1,
+            property_type="Check",
+        )
+    ps.save()
+    print("Set property setter successfully")

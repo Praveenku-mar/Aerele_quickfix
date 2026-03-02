@@ -145,3 +145,93 @@ If you miss internal logic from the base class, you can break validations, permi
 
 `doc_events` is additive and low risk.  
 `override_doctype_class` is invasive and easier to misuse.
+
+13.Multiple `validate` Handlers on Job Card
+
+When two `validate` handlers exist:
+
+- The `validate()` method inside the main DocType controller runs first.  
+- The `validate` function registered through `doc_events` runs after that.
+
+14. What If Both Raise `frappe.ValidationError`?
+
+Execution stops immediately when the first `frappe.ValidationError` is raised.  
+The second handler will not run.  
+Frappe aborts the request at the first thrown validation exception.  
+Only one error is returned to the browser — the one raised first.
+
+
+15. `app_include_js` vs `web_include_js`
+
+### Difference
+
+`app_include_js` loads JavaScript only inside the Desk (logged-in backend UI).  
+It affects internal users like Admin, Managers, Technicians using the Frappe workspace.
+
+`web_include_js` loads JavaScript only on public website or portal pages.  
+It does not load inside the Desk.
+
+---
+
+### When to Use Each
+
+Use `app_include_js` when customizing form behavior, list views, dashboards, or adding Desk-level UI logic.  
+
+Use `web_include_js` when adding frontend scripts for public pages, portals, landing pages, or guest-facing features.  
+
+Desk customization belongs in `app_include_js`.  
+Public website behavior belongs in `web_include_js`.
+
+
+16. `doctype_js`, `doctype_list_js`, and `doctype_tree_js`
+
+### `doctype_js` (Job Card)
+
+`doctype_js` attaches JavaScript to the Job Card form view.  
+It runs when opening or editing a single Job Card document.  
+Use it for field triggers, validations, button actions, and client-side logic specific to the form.
+
+---
+
+### `doctype_list_js` (Job Card)
+
+`doctype_list_js` applies to the Job Card list view.  
+It runs when viewing the table of multiple Job Cards.  
+Use it for custom list buttons, indicators, filters, or list-level UI behavior.
+
+---
+
+### `doctype_tree_js` (Not Applicable for Job Card)
+
+`doctype_tree_js` is used for hierarchical DocTypes that use a tree structure.  
+Example: Item Group, Account, or Territory.  
+These DocTypes have parent-child relationships and are displayed as expandable trees.  
+Job Card does not use tree view because it is a flat transactional document, not hierarchical data.
+
+
+17. `override_whitelisted_methods` vs Monkey Patching
+
+`override_whitelisted_methods` is a hook-based override defined in `hooks.py`.  
+It explicitly replaces a whitelisted method with your own implementation.  
+
+
+Monkey patching modifies the original function at import time.  
+It directly reassigns or alters the method in memory without a formal hook.  
+
+### When to Use Each
+
+Use `override_whitelisted_methods` when you want to safely replace standard API behavior in a maintainable way.  
+Use monkey patching only in rare edge cases where no hook exists and you fully control the environment.  
+In production application, Monkey patching is risky and not recommended.
+
+20 . What If Two Apps Override the Same Whitelisted Method?
+
+If two apps register `override_whitelisted_methods` for the same method, the app loaded last takes precedence.  
+This can create conflicts and unpredictable behavior if not managed carefully.
+
+21. Signature Mismatch and TypeError
+
+When overriding a method, your replacement must have the exact same function signature (same arguments).  
+If the original method expects arguments like:
+```python
+def get_data(docname, user=None):
