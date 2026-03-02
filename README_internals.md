@@ -207,7 +207,7 @@ Use it for custom list buttons, indicators, filters, or list-level UI behavior.
 Example: Item Group, Account, or Territory.  
 These DocTypes have parent-child relationships and are displayed as expandable trees.  
 Job Card does not use tree view because it is a flat transactional document, not hierarchical data.
-
+---
 
 17. `override_whitelisted_methods` vs Monkey Patching
 
@@ -223,15 +223,27 @@ It directly reassigns or alters the method in memory without a formal hook.
 Use `override_whitelisted_methods` when you want to safely replace standard API behavior in a maintainable way.  
 Use monkey patching only in rare edge cases where no hook exists and you fully control the environment.  
 In production application, Monkey patching is risky and not recommended.
+---
 
-20 . What If Two Apps Override the Same Whitelisted Method?
+18. . What If Two Apps Override the Same Whitelisted Method?
 
 If two apps register `override_whitelisted_methods` for the same method, the app loaded last takes precedence.  
 This can create conflicts and unpredictable behavior if not managed carefully.
 
-21. Signature Mismatch and TypeError
+---
+
+19. Signature Mismatch and TypeError
 
 When overriding a method, your replacement must have the exact same function signature (same arguments).  
 If the original method expects arguments like:
 ```python
 def get_data(docname, user=None):
+
+---
+20. Calling `frappe.call` inside `validate` (before_save)
+
+Calling `frappe.call` inside the client-side `validate` event does not work reliably because `validate` runs synchronously before the document is saved.  
+`frappe.call` is asynchronous by default, so the server response may not return before the save continues.  
+This creates race conditions where validation logic depends on data that has not arrived yet.  
+As a result, the document may save before the async check completes.
+---

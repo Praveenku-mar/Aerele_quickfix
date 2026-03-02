@@ -160,6 +160,29 @@ def check_technician(device_type,technician):
 			"status":"Active"
 		}
 	)
-
 	if not exits:
-		frappe.show_alert("Technician Specialization doesn't match with device type.")
+		frappe.show_alert("Technician specialization not matching with device type.")
+
+
+@frappe.whitelist()
+def show_alert():
+	frappe.log_error("11111111")
+	frappe.publish_realtime("job_ready",{'message':"This Job Card is Ready for Delivery"})
+
+
+
+@frappe.whitelist()
+def reject_job(name,reason):
+	frappe.log_error("reject_job function")
+	rej_doc = frappe.get_doc("Job Card",name)
+	rej_doc.status = "Cancelled"
+	rej_doc.remarks = reason
+	rej_doc.save()
+	frappe.db.commit()
+
+@frappe.whitelist()
+def assign_technician(name,technician):
+	doc = frappe.get_doc("Job Card",name)
+	doc.assigned_technician = technician
+	doc.save()
+	frappe.db.commit()
