@@ -31,8 +31,8 @@
   "payment_status",
   "column_break_bsyf",
   "delivery_date",
-  "remarks",
-  "status"
+  "status",
+  "remarks"
  ],
  "fields": [
   {
@@ -207,7 +207,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-27 13:06:54.066321",
+ "modified": "2026-03-02 14:45:31.534898",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Job Card",
