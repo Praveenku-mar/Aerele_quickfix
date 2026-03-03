@@ -1,0 +1,104 @@
+{
+ "add_total_row": 0,
+ "add_translate_data": 0,
+ "columns": [
+  {
+   "fieldname": "name",
+   "fieldtype": "Link",
+   "label": "Doc Name",
+   "options": "Job Card",
+   "width": 200
+  },
+  {
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "label": "Customer Name",
+   "width": 200
+  },
+  {
+   "fieldname": "device_type",
+   "fieldtype": "Link",
+   "label": "Device Type",
+   "options": "Device Type",
+   "width": 200
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status",
+   "width": 300
+  },
+  {
+   "fieldname": "assigned_technician",
+   "fieldtype": "Link",
+   "label": "Assigned Technician",
+   "options": "Technician",
+   "width": 200
+  },
+  {
+   "fieldname": "estimated_cost",
+   "fieldtype": "Currency",
+   "label": "Estimated Cost",
+   "width": 200
+  },
+  {
+   "fieldname": "creation",
+   "fieldtype": "Datetime",
+   "label": "Creation",
+   "width": 200
+  }
+ ],
+ "creation": "2026-03-03 15:20:00.332876",
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "mandatory": 0,
+   "options": "Delivered\nCancelled\nReady For Delivery",
+   "wildcard_filter": 0
+  },
+  {
+   "fieldname": "device_type",
+   "fieldtype": "Link",
+   "label": "Device Type",
+   "mandatory": 0,
+   "options": "Device Type",
+   "wildcard_filter": 0
+  }
+ ],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": null,
+ "modified": "2026-03-03 15:50:05.728116",
+ "modified_by": "Administrator",
+ "module": "Service Center",
+ "name": "Job Card QR",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "SELECT \n    name AS \"Job Card:Link/Job Card:150\",\n    customer_name AS \"Customer:Data:200\",\n    device_type AS \"Device Type:Link/Device Type:200\",\n    status AS \"Status:Data:150\",\n    assigned_technician AS \"Technician:Link/Technician:150\",\n    estimated_cost AS \"Estimated Cost:Currency:120\",\n    creation AS \"Created On:Datetime:180\"\nFROM \n    `tabJob Card`\nWHERE\n    status = %(status)s AND device_type = %(device_type)s\nORDER BY\n    creation DESC",
+ "ref_doctype": "Job Card",
+ "report_name": "Job Card QR",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "QF Manager"
+  },
+  {
+   "role": "QF Service Staff"
+  },
+  {
+   "role": "QF Technician"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Guest"
+  }
+ ],
+ "timeout": 0
+}
