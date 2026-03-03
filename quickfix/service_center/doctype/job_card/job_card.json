@@ -154,6 +154,7 @@
   {
    "fieldname": "final_amount",
    "fieldtype": "Currency",
+   "in_list_view": 1,
    "label": "Final Amount",
    "non_negative": 1,
    "read_only": 1
@@ -207,7 +208,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-03-02 14:45:31.534898",
+ "modified": "2026-03-03 12:14:06.040272",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Job Card",

@@ -57,12 +57,11 @@ def before_uninstall():
 
 
 def set_property():
-    ps = make_property_setter(
-            doctype="Job Card",
-            fieldname="remarks",
-            property="bold",
-            value=1,
-            property_type="Check",
-        )
-    ps.save()
-    print("Set property setter successfully")
+    frappe.make_property_setter({
+        "doctype": "Job Card",
+        "fieldname": "remarks",
+        "property": "bold",
+        "value": 1,
+        "property_type": "Check"
+    })
+    print("Property setter created successfully")

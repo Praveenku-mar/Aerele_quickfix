@@ -18,10 +18,10 @@ frappe.ui.form.on("Job Card", {
             );
         }
 
-        if(frm.doc.status === "Ready For Delivery" ){
+        if(frm.doc.status === "Ready For Delivery" && frm.doc.docstatus === 1 ){
             // console.log("Button")
             frm.add_custom_button("Mark as Delivered",()=>{
-                frm.set_value("status","Delivered");
+                // frm.set_value("status","Delivered");
             });
         }
 
@@ -39,6 +39,7 @@ frappe.ui.form.on("Job Card", {
         if(frm.doc.status != "Cancelled"){
         frm.add_custom_button(("Reject Job"), ()=>{
             console.log("reject")
+            console.log(frm.doc.device_type)
             let dialog = new frappe.ui.Dialog({
                 title:"Reject Job",
                 fields:[
@@ -46,7 +47,12 @@ frappe.ui.form.on("Job Card", {
                         label:"Rejection Reason",
                         fieldname:"reason",
                         fieldtype:"Small Text",
-                        reqd:1
+                        reqd:1,
+                        // get_query: () => ({
+					    //     filters: {
+						//         specialization: frm.doc.device_type,
+					    //     },
+				        // }),
                     }
                 ],
                 primary_action_label: "Submit",
@@ -79,20 +85,28 @@ frappe.ui.form.on("Job Card", {
                     fieldtype:"Link",
                     label:"Technician",
                     options:"Technician",
-                    reqd:1
+                    reqd:1,
+                        get_query: () => ({
+					        filters: {
+						        specialization: frm.doc.device_type,
+					        },
+				        }),
+
                 }
             ],
+            
             function(data){
                 frappe.confirm(`Are you sure you want change the technician to ${data.technician}?`,
                     () =>{
+                            
                             frappe.call({
                             method:"quickfix.service_center.doctype.job_card.job_card.assign_technician",
                             args:{
                                 name : frm.doc.name,
                                 technician : data.technician
                             },
-                            freeze: true,
-                            freeze_message : "Reassigning Technician......",
+                            // freeze: true,
+                            // freeze_message : "Reassigning Technician......",
                             callback: function(r){
                                 if(!r.exc){
                                     frappe.msgprint({
@@ -104,10 +118,9 @@ frappe.ui.form.on("Job Card", {
                                 
                             }
                         });
-                    }
-                    
-                )
-                
+                        frm.trigger("assigned_technician")
+                    }   
+                )  
             }
         )
     })
@@ -132,13 +145,7 @@ frappe.ui.form.on("Job Card", {
         })
     },
     assigned_technician(frm){
-        frappe.call({
-            method:"quickfix.service_center.doctype.job_card.job_card.check_technician",
-            args:{
-                "device_type":frm.doc.device_type,
-                "technician":frm.doc.assigned_technician
-            }
-        });
+        frm.call("check_technician");
     },
     labour_charge(frm) {
         calculate_total_amount(frm)
@@ -161,7 +168,7 @@ frappe.ui.form.on("Job Card", {
                             name: ["in", technician]
                         }
                     };
-                    })
+                    });
                 }
             }
         });
