@@ -273,3 +273,39 @@ A Tree DocType must include:
 - `is_group` – A Check field indicating whether the record can have child nodes.  
 
 Without these, Frappe cannot maintain or render the hierarchical structure properly.
+
+
+22. Client Script DocType vs Shipped JS (App-Level)
+
+### Tradeoffs
+
+A consultant would use **Client Script DocType** for quick, site-specific customizations without touching app code.  
+It is editable from Desk, requires no deployment, and is fast for small behavior changes.
+
+An app developer uses **shipped JS (doctype_js / app_include_js)** when building reusable, version-controlled, production-grade features.  
+This code lives inside the app repository and follows proper deployment workflows.
+
+### Risks of Client Script in Production
+
+Client Scripts are stored in the database, not version controlled by default.  
+They can be edited directly in production without review.  
+This increases the risk of breaking behavior silently.  
+They are harder to audit, test, and maintain at scale.
+
+Use Client Script for temporary or small custom logic.  
+Use shipped JS for structured application development.
+
+---
+
+## Hiding Fields vs Permission Security Pitfall
+
+### Example: Hide `customer_phone` for Non-Managers (Client Side)
+
+```javascript
+frappe.ui.form.on("Job Card", {
+    refresh(frm) {
+        if (!frappe.user.has_role("Manager")) {
+            frm.set_df_property("customer_phone", "hidden", 1);
+        }
+    }
+});

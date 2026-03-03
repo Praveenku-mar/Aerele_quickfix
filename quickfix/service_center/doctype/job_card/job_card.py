@@ -16,13 +16,14 @@ class JobCard(Document):
 	def before_submit(self):
 		self.validate_submit()
 		self.check_stock()	
+		self.status = "Delivered"
 
 	def on_submit(self):
-		self.status = "Delivered"
 		self.stock_update()
 		self.create_invoice()
 		self.notify_job_complete()
 		self.send_job_ready_mail()
+		# frappe.db.commit()
 	
 	def on_cancel(self):
 		self.status = "Cancelled"

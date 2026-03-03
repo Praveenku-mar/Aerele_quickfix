@@ -182,7 +182,8 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
-   "options": "Draft\nPending\nDiagnosis\nAwaiting Customer Approval\nIn Repair\nReady For Delivery\nDelivered\nCancelled"
+   "options": "Draft\nPending\nDiagnosis\nAwaiting Customer Approval\nIn Repair\nReady For Delivery\nDelivered\nCancelled",
+   "search_index": 1
   },
   {
    "fieldname": "part_used_section",
