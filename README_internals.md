@@ -247,3 +247,29 @@ Calling `frappe.call` inside the client-side `validate` event does not work reli
 This creates race conditions where validation logic depends on data that has not arrived yet.  
 As a result, the document may save before the async check completes.
 ---
+
+21. ## Tree DocType
+
+A Tree DocType represents hierarchical data stored in parent-child structure.  
+Examples include Account, Cost Center, Item Group, or an Employee reporting hierarchy.  
+Each record can have a parent, forming a structured expandable tree instead of a flat list.  
+It is used when data naturally follows levels or categories.
+
+---
+
+## `doctype_tree_js`
+
+`doctype_tree_js` is used to customize the behavior of a Tree view in Desk.  
+It allows adding custom buttons, filters, node actions, or UI logic specific to the tree interface.  
+It does not affect form or list view — only the tree view.
+
+---
+
+## Extra Fields Required for Tree DocType
+
+A Tree DocType must include:
+
+- `parent_field` – A Link field pointing to the same DocType to define hierarchy.  
+- `is_group` – A Check field indicating whether the record can have child nodes.  
+
+Without these, Frappe cannot maintain or render the hierarchical structure properly.
