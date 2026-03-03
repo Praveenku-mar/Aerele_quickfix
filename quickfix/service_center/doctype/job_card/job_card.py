@@ -9,7 +9,7 @@ from datetime import datetime
 class JobCard(Document):
 	def validate(self):
 		self.validate_phone()
-		self.check_assign_tech()
+		self.check_technician()
 		self.set_total_part_cost()
 		self.set_total_cost()
 
@@ -18,6 +18,7 @@ class JobCard(Document):
 		self.check_stock()	
 
 	def on_submit(self):
+		self.status = "Delivered"
 		self.stock_update()
 		self.create_invoice()
 		self.notify_job_complete()
@@ -38,8 +39,16 @@ class JobCard(Document):
 		if not re.fullmatch(r"\d{10}",phone):
 			frappe.throw("Customer phone number must contain exactly 10 digits.")
 
-	def check_assign_tech(self):
+	@frappe.whitelist()
+	def check_technician(self):
+		frappe.log_error("Check Technician")
 		req_status = ["In Repair","Ready For Delivery","Delivered","Cancelled"]
+		exits= frappe.db.exists("Technician", {
+			"name": self.assigned_technician,
+			"status": "Active"
+			})
+		if not exits:
+			frappe.throw(f"{self.assigned_technician} Technician is on Leave.")
 		if self.status in req_status and not self.assigned_technician:
 			frappe.throw("Assigned Technician is mandatory for this status.")
 
@@ -151,17 +160,17 @@ def get_technician(device_type):
 		},pluck="name"
 	)
 
-@frappe.whitelist()
-def check_technician(device_type,technician):
-	exits = frappe.db.exists("Technician",
-		filters={
-			"name":technician,
-			"specialization":device_type,
-			"status":"Active"
-		}
-	)
-	if not exits:
-		frappe.show_alert("Technician specialization not matching with device type.")
+# @frappe.whitelist()
+# def check_technician(device_type,technician):
+# 	exits = frappe.db.exists("Technician",
+# 		{
+# 			"name":technician,
+# 			"specialization":device_type,
+# 			"status":"Active"
+# 		}
+# 	)
+# 	if not exits:
+# 		frappe.show_alert("Technician specialization not matching with device type or is on Leave.")
 
 
 @frappe.whitelist()
@@ -186,3 +195,7 @@ def assign_technician(name,technician):
 	doc.assigned_technician = technician
 	doc.save()
 	frappe.db.commit()
+
+@frappe.whitelist()
+def mark_delivered(doctype,name,fieldname,value):
+	frappe.set_value(doctype,name,fieldname,value)
