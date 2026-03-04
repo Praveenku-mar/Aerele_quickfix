@@ -5,11 +5,11 @@ frappe.listview_settings["Job Card"] = {
     color_map: {
         "Diagnosis": "orange",
         "In Repair": "blue",
-        "Ready For Delivery": "green",
-        "Delivered": "gray",
+        "Ready For Delivery": "yellow",
+        "Delivered": "green",
         "Cancelled": "red"
     },
-
+    has_indicator_for_draft :true,
     get_indicator(doc) {
         if (!doc.status) return;
 

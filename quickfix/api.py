@@ -1,6 +1,6 @@
 import frappe
 from frappe.query_builder import DocType
-from frappe.utils import nowdate
+from frappe.utils import nowdate, now
 
 
 @frappe.whitelist()
@@ -182,9 +182,14 @@ def get_job_cards_safe():
 
 @frappe.whitelist()
 def custom_get_count(doctype,filters=None, debug=False, cache=False):
-	frappe.get_doc({"doctype":"Audit Log",
-	"doctype_name":doctype,
-	"action":"count_queried",
-	"user":frappe.session.user}).insert(ignore_permissions=True)
+	print("12345")
+	frappe.log_error("21345678")
+	doc = frappe.new_doc("Audit Log")
+	doc.doctype_name=doctype
+	doc.action="count_queried"
+	doc.timestamp=now()
+	doc.user=frappe.session.user
+	doc.insert(ignore_permissions=True)
+	frappe.db.commit()
 	from frappe.client import get_count
 	return get_count(doctype, filters, debug, cache)

@@ -3,53 +3,69 @@
 
 import frappe
 
+from frappe.utils import date_diff
 
 def execute(filters=None):
-	
-	return get_columns(),get_data(filters)
+    if not filters:
+        filters = {}
 
+    columns = get_columns()
+    data = get_data(filters)
+    chart = get_chart(data)
 
+    return columns, data, None, chart
 
 def get_columns():
-	return[
-		{
-			"fieldname":"technician",
-			"fieldtype":"Link",
-			"label":"Technician",
-			"options":"Technician",
-			"width":200
-		},
-		{
-			"fieldname":"total_jobs",
-			"fieldtype":"Int",
-			"label":"Total Jobs",
-			"width":200
-		},
-		{
-			"fieldname":"completed_jobs",
-			"fieldtype":"Int",
-			"label":"Completed",
-			"width":200
-		},
-		{
-			"fieldname":"avg_turnaround_days",
-			"fieldtype":"Currency",
-			"label":"Avg Turnaround Days",
-			"width":200
-		},
-		{
-			"fieldname":"revenue",
-			"fieldtype":"Currency",
-			"label":"Revenue",
-			"width":200
-		},
-		{
-			"fieldname":"completion_rate",
-			"fieldtype":"Float",
-			"label":"Completion Rate",
-			"width":200
-		}
-	]
+    cols = [
+        {
+            "fieldname":"technician",
+            "fieldtype":"Link",
+            "label":"Technician",
+            "options":"Technician",
+            "width":200
+        },
+        {
+            "fieldname":"total_jobs",
+            "fieldtype":"Int",
+            "label":"Total Jobs",
+            "width":200
+        },
+        {
+            "fieldname":"completed_jobs",
+            "fieldtype":"Int",
+            "label":"Completed",
+            "width":200
+        },
+        {
+            "fieldname":"avg_turnaround_days",
+            "fieldtype":"Int",
+            "label":"Avg Turnaround Days",
+            "width":200
+        },
+        {
+            "fieldname":"revenue",
+            "fieldtype":"Currency",
+            "label":"Revenue",
+            "width":200
+        },
+        {
+            "fieldname":"completion_rate",
+            "fieldtype":"Percentage",
+            "label":"Completion Rate",
+            "width":200
+        }
+    ]
+    for dt in frappe.get_all("Device Type", fields=["name"]):
+        fieldname = dt.name.lower()
+
+        cols.append({
+            "label": dt.name,
+            "fieldname": fieldname,
+            "fieldtype": "Int",
+            "width": 100
+        })
+    return cols
+
 def get_data(filters):
 
     job_filters = {"docstatus": 1}
@@ -60,6 +76,13 @@ def get_data(filters):
     if filters.get("from_date") and filters.get("to_date"):
         job_filters["creation"] = ["between", [filters.get("from_date"), filters.get("to_date")]]
 
+    device_types = frappe.get_all("Device Type",fields=["name"])
+    device_map = {
+        dt.name: dt.name.lower()
+        for dt in device_types
+    }
+    frappe.log_error("11111",device_map)
+
     jobs = frappe.get_all(
         "Job Card",
         filters=job_filters,
@@ -68,8 +91,9 @@ def get_data(filters):
             "status",
             "final_amount",
             "labour_charge",
+            "device_type",
             "creation",
-            "modified"
+            "delivery_date"
         ]
     )
 
@@ -89,19 +113,27 @@ def get_data(filters):
                 "revenue": 0,
                 "total_turnaround_days": 0,
                 "avg_turnaround_days": 0,
-                "completion_rate": 0
+                "completion_rate": 0,
             }
+            for fieldname in device_map.values():
+                result[tech][fieldname] = 0
 
         result[tech]["total_jobs"] += 1
 
+        # Count device type
+        if job.device_type in device_map:
+            fieldname = device_map[job.device_type]
+            result[tech][fieldname] += 1
+
+
         if job.status == "Delivered":
             result[tech]["completed_jobs"] += 1
-            result[tech]["revenue"] += flt(job.final_amount)
-            result[tech]["total_labour_charge"] += flt(job.labour_charge)
+            result[tech]["revenue"] += job.final_amount
+            result[tech]["total_labour_charge"] += job.labour_charge
 
             # Calculate turnaround days
-            turnaround = date_diff(job.modified, job.creation)
-            result[tech]["total_turnaround_days"] += flt(turnaround)
+            turnaround = date_diff(job.delivery_date, job.creation)
+            result[tech]["total_turnaround_days"] += turnaround
 
     # Final Calculations
     for tech in result:
@@ -121,3 +153,35 @@ def get_data(filters):
         result[tech].pop("total_turnaround_days", None)
 
     return list(result.values())
+
+
+def get_chart(data):
+
+    labels = []
+    total_jobs = []
+    completed_jobs = []
+
+    for row in data:
+        labels.append(row.get("technician"))
+        total_jobs.append(row.get("total_jobs"))
+        completed_jobs.append(row.get("completed_jobs"))
+
+    chart = {
+        "data": {
+            "labels": labels,
+            "datasets": [
+                {
+                    "name": "Total Jobs",
+                    "values": total_jobs
+                },
+                {
+                    "name": "Completed Jobs",
+                    "values": completed_jobs
+                }
+            ]
+        },
+        "type": "bar",
+        "colors": ["#3b5bdb", "#2f9e44"]
+    }
+
+    return chart
