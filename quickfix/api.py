@@ -193,3 +193,5 @@ def custom_get_count(doctype,filters=None, debug=False, cache=False):
 	frappe.db.commit()
 	from frappe.client import get_count
 	return get_count(doctype, filters, debug, cache)
+
+

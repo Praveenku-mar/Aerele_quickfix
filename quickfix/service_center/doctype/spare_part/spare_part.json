@@ -12,7 +12,7 @@
   "unit_cost",
   "selling_price",
   "stock_qty",
-  "recorder_level",
+  "reorder_level",
   "is_active"
  ],
  "fields": [
@@ -60,27 +60,40 @@
    "label": "Stock Qty"
   },
   {
-   "default": "5",
-   "fieldname": "recorder_level",
-   "fieldtype": "Float",
-   "label": "Recorder Level"
-  },
-  {
    "default": "1",
    "fieldname": "is_active",
    "fieldtype": "Check",
    "label": "is_active"
+  },
+  {
+   "default": "5",
+   "fieldname": "reorder_level",
+   "fieldtype": "Float",
+   "label": "Reorder Level"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-25 15:08:19.561890",
+ "modified": "2026-03-04 23:44:17.292330",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Spare Part",
  "owner": "Administrator",
  "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "read": 1,
+   "role": "QF Manager",
+   "write": 1
+  },
+  {
+   "if_owner": 1,
+   "read": 1,
+   "role": "QF Technician"
+  },
   {
    "create": 1,
    "delete": 1,
@@ -96,19 +109,6 @@
   {
    "read": 1,
    "role": "QF Service Staff"
-  },
-  {
-   "if_owner": 1,
-   "read": 1,
-   "role": "QF Technician"
-  },
-  {
-   "create": 1,
-   "delete": 1,
-   "export": 1,
-   "read": 1,
-   "role": "QF Manager",
-   "write": 1
   }
  ],
  "row_format": "Dynamic",
