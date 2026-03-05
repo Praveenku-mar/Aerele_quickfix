@@ -12,8 +12,8 @@ def execute(filters=None):
     columns = get_columns()
     data = get_data(filters)
     chart = get_chart(data)
-
-    return columns, data, None, chart
+    frappe.log_error("111111",data)
+    return columns, data, None, chart,get_report_summary(data)
 
 def get_columns():
     cols = [
@@ -55,7 +55,7 @@ def get_columns():
             "width":200
         }
     ]
-    for dt in frappe.get_all("Device Type", fields=["name"]):
+    for dt in frappe.get_list("Device Type", fields=["name"]):
         fieldname = dt.name.lower()
 
         cols.append({
@@ -76,14 +76,14 @@ def get_data(filters):
     if filters.get("from_date") and filters.get("to_date"):
         job_filters["creation"] = ["between", [filters.get("from_date"), filters.get("to_date")]]
 
-    device_types = frappe.get_all("Device Type",fields=["name"])
+    device_types = frappe.get_list("Device Type",fields=["name"])
     device_map = {
         dt.name: dt.name.lower()
         for dt in device_types
     }
     frappe.log_error("11111",device_map)
 
-    jobs = frappe.get_all(
+    jobs = frappe.get_list(
         "Job Card",
         filters=job_filters,
         fields=[
@@ -185,3 +185,40 @@ def get_chart(data):
     }
 
     return chart
+
+def get_report_summary(data):
+    if not data:
+        return []
+
+    total_jobs = 0
+    total_revenue = 0
+    best_technician = None
+    best_rate = -1
+    
+    for row in data:
+        rate = row.get("completion_rate") or 0
+        frappe.log_error("rate",rate)
+        if rate > best_rate:
+            best_rate = rate
+            best_technician = row.get("technician")
+            total_revenue = row.get("revenue") or 0
+            total_jobs = row.get("total_jobs") or 0
+
+    return [
+        {
+            "label": "Total Jobs",
+            "value": total_jobs,
+            "indicator": "Blue"
+        },
+        {
+            "label": "Total Revenue",
+            "value": total_revenue,
+            "indicator": "Green",
+            "datatype": "Currency"
+        },
+        {
+            "label": "Best Technician",
+            "value": best_technician or "N/A",
+            "indicator": "Green" if best_rate >= 90 else "Orange"
+        }
+    ]
