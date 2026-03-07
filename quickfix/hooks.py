@@ -104,10 +104,10 @@ doctype_list_js = {
 # # ----------
 
 # # add methods and filters to jinja environment
-# jinja = {
-# 	"methods": "quickfix.utils.get_shop_name",
-# 	"filters": "quickfix.utils.format_job_id"
-# }
+jinja = {
+	"methods": "quickfix.utils.get_shop_name",
+	"filters": "quickfix.utils.format_job_id"
+}
 
 # # Installation
 # # ------------

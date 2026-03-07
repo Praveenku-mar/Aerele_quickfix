@@ -52,6 +52,7 @@ def get_columns():
             "fieldname":"completion_rate",
             "fieldtype":"Percentage",
             "label":"Completion Rate",
+            "precision": 2,
             "width":200
         }
     ]
@@ -68,7 +69,7 @@ def get_columns():
 
 def get_data(filters):
 
-    job_filters = {"docstatus": 1}
+    job_filters = {}
 
     if filters.get("technician"):
         job_filters["assigned_technician"] = filters.get("technician")
@@ -81,8 +82,7 @@ def get_data(filters):
         dt.name: dt.name.lower()
         for dt in device_types
     }
-    frappe.log_error("11111",device_map)
-
+    
     jobs = frappe.get_list(
         "Job Card",
         filters=job_filters,
@@ -96,6 +96,7 @@ def get_data(filters):
             "delivery_date"
         ]
     )
+    frappe.log_error("job",jobs)
 
     result = {}
 
@@ -141,17 +142,13 @@ def get_data(filters):
         completed = result[tech]["completed_jobs"]
 
         # Completion Rate
-        result[tech]["completion_rate"] = (completed / total) * 100 if total else 0
+        result[tech]["completion_rate"] = round((completed / total) * 100,2) if total else 0
 
         # Average Turnaround
         if completed > 0:
             result[tech]["avg_turnaround_days"] = (
                 result[tech]["total_turnaround_days"] / completed
             )
-
-        # Remove helper field (not needed in report)
-        result[tech].pop("total_turnaround_days", None)
-
     return list(result.values())
 
 

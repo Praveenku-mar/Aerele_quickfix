@@ -8,6 +8,7 @@ from datetime import datetime
 
 class JobCard(Document):
 	def validate(self):
+		self.final = self.final_amount
 		self.validate_phone()
 		self.check_technician()
 		self.set_total_part_cost()
@@ -33,6 +34,9 @@ class JobCard(Document):
 	def on_trash(self):
 		if self.status != "Cancelled" and self.status != "Draft":
 			frappe.throw("You can only delete Draft or Cancelled Job Cards.")
+
+	def before_print(self, print_settings=None):
+		self.print_summary = f"{self.customer_name} - {self.device_type} {self.device_brand}"
 
 	#Validate Hook
 	def validate_phone(self):

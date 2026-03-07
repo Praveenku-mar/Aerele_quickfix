@@ -6,12 +6,8 @@ frappe.query_reports["Spare Parts Inventory"] = {
 
 		value = default_formatter(value, row, column, data);
 		// console.log(data.stock_qty,data.reorder_level)
-		if (
-			data &&
-			Number(data.stock_qty) <= Number(data.reorder_level)
-		) {
-			// console.log(data.stock_qty,data.recorder_level)
-			return `<div style="background-color:#ffcccc;
+		if (data && Number(data.stock_qty) <= Number(data.reorder_level)) {
+			return `<div style="background-color:#fb2b2b;
 				font-weight:bold;
 				padding:4px;">
 				${value}

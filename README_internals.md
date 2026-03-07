@@ -309,3 +309,27 @@ frappe.ui.form.on("Job Card", {
         }
     }
 });
+
+23. ## Prepared Report vs Real-Time Script Report
+
+### When to Use Prepared Report
+
+Prepared Report is used when the report takes a long time to run or processes a large amount of data.  
+The report runs in the background using a worker and the result is stored.  
+Users later download or view the stored result instead of running the query again.
+
+### When to Use Real-Time Script Report
+
+Real-time Script Report runs immediately when the user opens the report.  
+It is used when the report query is fast and the data size is small.  
+The result always reflects the current data in the database.
+
+### Staleness Tradeoff
+
+Prepared Reports can become **stale** because they show the data from the time the report was generated.  
+If new records are added or updated later, the prepared report will not include those changes.
+
+24 . Caching Risk
+
+If the underlying data changes after the report is prepared, the user still sees the **old stored result**.  
+The report will only show updated data after it is prepared again.

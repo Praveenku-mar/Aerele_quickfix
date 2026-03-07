@@ -1,0 +1,92 @@
+{
+ "charts": [
+  {
+   "chart_name": "Status",
+   "label": "Status"
+  }
+ ],
+ "content": "[{\"id\":\"OXOasnPqgG\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">QuickFix</span>\",\"col\":12}},{\"id\":\"b6yJ5JEe2_\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Open Job\",\"col\":4}},{\"id\":\"DLlborDYHh\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Revenue\",\"col\":4}},{\"id\":\"LGyddaWzaD\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Status\",\"col\":12}},{\"id\":\"9M8V6wWcmD\",\"type\":\"paragraph\",\"data\":{\"text\":\"Doctype Shortcut\",\"col\":12}},{\"id\":\"6smUqK9XV7\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Technician\",\"col\":3}},{\"id\":\"EC_d49bEW_\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Spare Parts\",\"col\":3}},{\"id\":\"YSvdSIYBbA\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Job Card\",\"col\":3}},{\"id\":\"0KgeOYv6IP\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Audit Log \",\"col\":3}},{\"id\":\"7IhHoiJK14\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Invoice\",\"col\":3}},{\"id\":\"W5R6RqKcOY\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Device Type\",\"col\":3}}]",
+ "creation": "2026-03-06 18:24:06.389728",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "income",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "QuickFix",
+ "links": [],
+ "modified": "2026-03-06 18:51:35.913490",
+ "modified_by": "Administrator",
+ "module": "Service Center",
+ "name": "QuickFix",
+ "number_cards": [
+  {
+   "label": "Total Open Job",
+   "number_card_name": "total open job card"
+  },
+  {
+   "label": "Total Revenue",
+   "number_card_name": "total revenue"
+  }
+ ],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 29.0,
+ "shortcuts": [
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Job Card",
+   "link_to": "Job Card",
+   "stats_filter": "[[\"Job Card\",\"final_amount\",\">=\",0,false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Service Invoice",
+   "link_to": "Service Invoice",
+   "stats_filter": "[[\"Service Invoice\",\"total_amount\",\">=\",0,false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Audit Log ",
+   "link_to": "Audit Log",
+   "stats_filter": "[[\"Audit Log\",\"creation\",\">\",\"2026-02-01 18:49:19\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Technician",
+   "link_to": "Technician",
+   "stats_filter": "[[\"Technician\",\"joining_date\",\">\",\"2025-12-01\",false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Spare Parts",
+   "link_to": "Spare Part",
+   "stats_filter": "[[\"Spare Part\",\"stock_qty\",\">=\",0,false]]",
+   "type": "DocType"
+  },
+  {
+   "color": "Green",
+   "doc_view": "List",
+   "label": "Device Type",
+   "link_to": "Device Type",
+   "stats_filter": "[[\"Device Type\",\"average_repair_hours\",\">=\",0,false]]",
+   "type": "DocType"
+  }
+ ],
+ "title": "QuickFix"
+}
