@@ -104,10 +104,10 @@ doctype_list_js = {
 # # ----------
 
 # # add methods and filters to jinja environment
-# jinja = {
-# 	"methods": "quickfix.utils.get_shop_name",
-# 	"filters": "quickfix.utils.format_job_id"
-# }
+jinja = {
+	"methods": "quickfix.utils.get_shop_name",
+	"filters": "quickfix.utils.format_job_id"
+}
 
 # # Installation
 # # ------------
@@ -185,23 +185,17 @@ doc_events = {
 # # Scheduled Tasks
 # # ---------------
 
-# # scheduler_events = {
-# # 	"all": [
-# # 		"quickfix.tasks.all"
-# # 	],
-# # 	"daily": [
-# # 		"quickfix.tasks.daily"
-# # 	],
-# # 	"hourly": [
-# # 		"quickfix.tasks.hourly"
-# # 	],
-# # 	"weekly": [
-# # 		"quickfix.tasks.weekly"
-# # 	],
-# # 	"monthly": [
-# # 		"quickfix.tasks.monthly"
-# # 	],
-# # }
+scheduler_events = {
+    "daily": [
+        "quickfix.utils.check_low_stock",
+        "quickfix.utils.send_mail"
+    ],
+    "corn":{
+        "0 2 1 * *":[
+            "quickfix.utils.monthly_revenue_report"
+        ]
+    }
+}
 
 # # Testing
 # # -------

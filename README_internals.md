@@ -309,3 +309,78 @@ frappe.ui.form.on("Job Card", {
         }
     }
 });
+
+23. ## Prepared Report vs Real-Time Script Report
+
+### When to Use Prepared Report
+
+Prepared Report is used when the report takes a long time to run or processes a large amount of data.  
+The report runs in the background using a worker and the result is stored.  
+Users later download or view the stored result instead of running the query again.
+
+### When to Use Real-Time Script Report
+
+Real-time Script Report runs immediately when the user opens the report.  
+It is used when the report query is fast and the data size is small.  
+The result always reflects the current data in the database.
+
+### Staleness Tradeoff
+
+Prepared Reports can become **stale** because they show the data from the time the report was generated.  
+If new records are added or updated later, the prepared report will not include those changes.
+
+24 . Caching Risk
+
+If the underlying data changes after the report is prepared, the user still sees the **old stored result**.  
+The report will only show updated data after it is prepared again.
+
+
+25. Avoid `frappe.get_all()` Inside Jinja Templates
+
+Calling `frappe.get_all()` directly inside a Jinja template is bad practice.  
+Templates should only display data, not run database queries.  
+Putting queries in templates makes rendering slow and mixes presentation with business logic.
+
+---
+
+## Correct Pattern: Pre-compute in `before_print()`
+
+Instead, compute the data in Python before rendering the template.
+
+```python
+def before_print(self):
+    self.precomputed_field = frappe.get_all(
+        "Job Card",
+        filters={"assigned_technician": self.assigned_technician},
+        fields=["name", "status"]
+    )
+
+26. Raw Printing vs HTML-PDF Printing (WeasyPrint)
+
+### Raw Printing (ESC/POS)
+
+Raw printing sends **ESC/POS commands directly to a thermal printer**.  
+The printer interprets these commands to print text, align content, cut paper, or control formatting.  
+It bypasses HTML rendering and works directly with the printer hardware.  
+This method is fast and commonly used for POS bills and receipt printers.
+
+---
+
+### HTML-PDF Printing (WeasyPrint)
+
+Frappe normally renders print formats as **HTML**, then converts them to **PDF using WeasyPrint**.  
+The browser-style HTML and CSS are processed by WeasyPrint to generate a printable PDF.  
+This approach works well for invoices, reports, and structured documents.  
+However, WeasyPrint does not support all browser CSS features.
+
+---
+
+## CSS That Works in Browsers but Often Fails in WeasyPrint
+
+Examples include:
+
+- `position: fixed` (especially complex layouts)
+- `flexbox` (`display: flex`)
+- `grid layout` (`display: grid`)
+
+These layouts may render correctly in browsers but break or behave differently in WeasyPrint PDFs.
