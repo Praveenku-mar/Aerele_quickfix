@@ -2,14 +2,18 @@ import frappe
 from frappe.utils import now
 
 def log_change(doc, method):
-    # if doc.doctype == "Audit Log":
-    #     return  
-    doctype = ['Technician','Device Type','Spare Part','Job Card','QuickFix Settings','Service Invoice',"Part Usage Entry"]
+    if doc.doctype == "Audit Log":
+        return  
+    doctype = ['Technician','Device Type','Spare Part','Job Card','QuickFix Settings','Service Invoice',"Part Usage Entry","scheduled Job Log"]
     if doc.doctype in doctype:
         audit = frappe.new_doc("Audit Log")
         audit.doctype_name = doc.doctype
         audit.document_id = doc.name
-        audit.action = method
+        if doc.doctype == "Scheduled Job Log":
+            frappe.log_error("method",method)
+            audit.action = "low_stock_check"
+        else:
+            audit.action = method
         audit.user = frappe.session.user
         audit.timestamp = now()
         audit.insert(ignore_permissions=True)

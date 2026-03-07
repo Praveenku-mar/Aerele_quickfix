@@ -176,3 +176,5 @@ def get_job_card_safe():
             row.pop("customer_email", None)
     
     return data
+
+
