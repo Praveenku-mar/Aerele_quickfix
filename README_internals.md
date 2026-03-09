@@ -124,7 +124,7 @@ If you only need to modify fields on the same document:
 ```python
 def validate(self):
     self.total = self.qty * self.rate
-
+```
 ---
 
 12 .What is the issue with using `frappe.get_all()` inside a whitelisted method exposed to guests or low-privilege users, especially regarding `permission_query_conditions`?
@@ -238,7 +238,7 @@ When overriding a method, your replacement must have the exact same function sig
 If the original method expects arguments like:
 ```python
 def get_data(docname, user=None):
-
+```
 ---
 20. Calling `frappe.call` inside `validate` (before_save)
 
