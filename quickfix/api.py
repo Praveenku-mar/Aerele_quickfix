@@ -1,7 +1,8 @@
 import frappe
 from frappe.query_builder import DocType
-from frappe.utils import nowdate, now
-
+from frappe.utils import nowdate, now_datetime,now
+from datetime import datetime
+import time
 
 @frappe.whitelist()
 def get_job_summary():
@@ -145,6 +146,12 @@ def share_job_card(job_card_name, user_email):
 	)
 	return "Successfully Shared"
 
+@frappe.whitelist()
+def manager_only_action():
+    frappe.only_for("QF Manager")
+    return "Access Granted. Manager action executed."
+
+
 
 @frappe.whitelist()
 def get_job_cards_unsafe():
@@ -222,3 +229,122 @@ def get_status_chart_data():
         ],
         "type": "bar"
     }
+
+
+# @frappe.whitelist(allow_guest=True)
+# def get_docc():
+#     try:
+#         frappe.get_doc("job Card")
+#     except Exception as e:
+#         frappe.log_error("Failed Job",e)
+@frappe.whitelist()
+def bulk_cancelled_loop():
+	start = time.time()
+
+	drafts = frappe.get_all("Job Card", filters={"status": "Draft"}, pluck="name")
+
+	for name in drafts:
+		frappe.db.set_value("Job Card", name, "status", "Cancelled")
+
+	frappe.db.commit()
+
+	end = time.time()
+	print(f"Time :{end-start}'s")
+
+@frappe.whitelist()
+def bulk_cancelled():
+	start = time.time()
+	frappe.db.sql("""
+	UPDATE `tabJob Card` 
+	SET status = "Cancelled"
+	WHERE status = "Draft"
+	ORDER BY creation
+	LIMIT 1000
+	"""
+	)
+	frappe.db.commit()
+	end = time.time()
+	print(f"Time :{end-start}'s")
+
+
+@frappe.whitelist()
+def insert_audit_logs_bulk(n: int = 500) -> float:
+	"""
+	Insert *n* Audit Log records using frappe.db.bulk_insert.
+	Fields: doctype_name, document_id, action, user, timestamp
+	Returns elapsed seconds.
+	"""
+	now = now_datetime()
+	fields = [
+		"name", "owner", "creation", "modified",
+		"modified_by", "docstatus", "idx",
+		"doctype_name", "action", "user", "timestamp",
+	]
+
+	rows = []
+	current_count = frappe.db.count("Audit Log")
+	year = datetime.now().year
+	start = time.time()
+	for i in range(n):
+		row_name = f"AL-{year}-{current_count + i + 1:05d}"
+		rows.append((
+			row_name,                        # name
+			"Administrator",                 # owner
+			now,                             # creation
+			now,                             # modified
+			"Administrator",                 # modified_by
+			0,                               # docstatus
+			i,                               # idx
+			"Job Card",                      # doctype_name
+			"Cancelled",                     # action
+			"Administrator",                 # user
+			now,                             # timestamp (Asia/Kolkata stored as UTC)
+		))
+	frappe.db.bulk_insert(
+		"Audit Log",
+		fields=fields,
+		values=rows,
+		ignore_duplicates=True,
+	)
+	frappe.db.commit()
+	end = time.time()
+	print(f"Time :{end-start}'s")
+
+
+@frappe.whitelist()
+def bulk_insert_loop():
+	start = time.perf_counter()
+
+	for i in range(500):
+		log = frappe.new_doc("Audit Log")
+		log.doctype_name = "Job Card",
+		log.action = "Cancelled",
+		log.timestamp = now,
+		log.user = "Admin"
+
+	frappe.db.commit()
+
+	end = time.time()
+	print(f"Time :{end-start}'s")
+
+
+
+# praveenkumar@praveenkumar-ThinkPad-T480:~/frappe-bench$ bench console
+# Apps in this namespace:
+# frappe, quickfix
+
+# In [1]: from quickfix.api import bulk_cancelled,bulk_cancelled_loop
+
+# In [2]: bulk_cancelled()
+# Time :0.001634359359741211's
+
+# In [3]: bulk_cancelled_loop()
+# Time :0.015452861785888672's
+
+# In [4]: from quickfix.api import bulk_insert_loop,insert_audit_logs_bulk
+
+# In [5]: bulk_insert_loop()
+# Time :1773033297.7144365's
+
+# In [6]: insert_audit_logs_bulk()
+# Time :0.059677839279174805's

@@ -190,7 +190,7 @@ scheduler_events = {
         "quickfix.utils.check_low_stock",
         "quickfix.utils.send_mail"
     ],
-    "corn":{
+    "cron":{
         "0 2 1 * *":[
             "quickfix.utils.monthly_revenue_report"
         ]

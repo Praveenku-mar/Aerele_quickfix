@@ -384,3 +384,209 @@ Examples include:
 - `grid layout` (`display: grid`)
 
 These layouts may render correctly in browsers but break or behave differently in WeasyPrint PDFs.
+
+27 .  Disabling the Scheduler for a Specific Site
+
+You can disable the scheduler for a site by running:
+
+```bash
+bench --site site-name set-config enable_scheduler 0
+```
+
+This updates the site’s `site_config.json` and stops scheduled tasks from being queued for that site.
+
+### Why Disable It on a Dev Site
+
+On a development site, scheduled jobs like emails, cleanup tasks, or integrations may run automatically.  
+This can create unnecessary logs, background jobs, or external API calls during testing.  
+Disabling the scheduler keeps the dev environment predictable and quiet.
+
+---
+
+## What Happens to Scheduled Jobs if the Worker Was Down?
+
+If the worker process is down, queued jobs stay in Redis.  
+They are not executed while the worker is offline.
+
+When the worker starts again, it picks up the queued jobs and begins processing them.  
+So the jobs are delayed, not lost.
+
+
+28. Task A - N+1 query detection and fix:
+The following code has an N+1 query problem. Identify it and rewrite it:
+# N+1 PROBLEM - fix this
+job_cards = frappe.get_all("Job Card", fields=["name","assigned_technician"])
+for jc in job_cards:
+    tech = frappe.get_doc("Technician", jc.assigned_technician)
+    print(tech.technician_name, tech.phone)
+
+## Answer:
+
+job_card = frappe.get_all("Job Card", fields=["name","assigned_technician"])
+for job in job_card:
+    tech_name,tech_phone = frappe.db.get_value("Technician",job,fields=["technician_name","phone"])
+    print(tech_name,tech_phone)
+
+
+29. Why You Should Not Add a Search Index to Every Field
+
+Adding an index to every field is unnecessary and harmful.  
+Indexes improve **read/search speed**, but they slow down **write operations** like insert, update, and delete.
+
+Every time a record changes, the database must update **all related indexes**.  
+If too many indexes exist, each write operation becomes slower and consumes more CPU and disk space.
+
+### Performance Cost of Over-Indexing
+
+1. **Slower Inserts and Updates** – The database must update multiple indexes for every change.  
+2. **More Storage Usage** – Each index takes extra disk space.  
+3. **Slower Maintenance** – Query planning and index management become heavier.
+
+Indexes should only be added to fields that are **frequently searched, filtered, or used in joins**.
+
+
+
+30. API Response 
+
+## DELETE
+
+http://quickfix-dev.localhost:8000/api/resource/Spare Part/PH-200-PART-2026-0031
+
+{
+    "data": "ok"
+}
+
+## PUT 
+
+http://quickfix-dev.localhost:8000/api/resource/Spare Part/PH-200-PART-2026-0031
+
+{
+    "data": {
+        "name": "LP-114-PART-2026-0014",
+        "owner": "Administrator",
+        "creation": "2026-03-06 15:22:38.723970",
+        "modified": "2026-03-09 18:50:08.502976",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 0,
+        "part_name": "Laptop Keyboard Backlit",
+        "part_code": "LP-114",
+        "compatible_device_type": "Laptop",
+        "unit_cost": 1500.0,
+        "selling_price": 2200.0,
+        "stock_qty": 18.0,
+        "reorder_level": 6.0,
+        "is_active": 1,
+        "doctype": "Spare Part"
+    }
+}
+
+## POST
+
+http://quickfix-dev.localhost:8000/api/resource/Spare Part
+
+body :
+{
+    "part_name":"Battery",
+    "part_code":"PH-200",
+    "compatible_device_type":"Smartphone",
+    "unit_cost":2000,
+    "selling_price":3000,
+    "stock_qty":100,
+    "reorder_level":5,
+    "is_active":1
+}
+
+## GET
+
+http://quickfix-dev.localhost:8000/api/resource/Job Card
+
+{
+    "data": [
+        {
+            "name": "JC-2026-00019"
+        },
+        {
+            "name": "JC-2026-00018"
+        }
+    ]
+}
+
+http://quickfix-dev.localhost:8000/api/resource/Job Card/JC-2026-00019
+
+{
+    "data": {
+        "name": "JC-2026-00019",
+        "owner": "Administrator",
+        "creation": "2026-03-06 15:28:03.224429",
+        "modified": "2026-03-06 15:35:09.057130",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 0,
+        "customer_name": "Manoj",
+        "customer_phone": "9223344556",
+        "customer_email": "manoj@mail.com",
+        "device_type": "Tablet",
+        "device_brand": "Samsung",
+        "imei_or_serial": "SM-T500",
+        "problem_description": "Display cracked",
+        "assigned_technician": "TECH-0004",
+        "diagnosis_notes": "Display replaced",
+        "estimated_cost": 3900.0,
+        "priority": "Normal",
+        "parts_total": 3900.0,
+        "labour_charge": 1500.0,
+        "final_amount": 5400.0,
+        "payment_status": "Unpaid",
+        "final": 0.0,
+        "status": "Ready For Delivery",
+        "doctype": "Job Card",
+        "parts_used": [
+            {
+                "name": "stg3ghcdsk",
+                "owner": "Administrator",
+                "creation": "2026-03-06 15:28:03.224429",
+                "modified": "2026-03-06 15:35:09.057130",
+                "modified_by": "Administrator",
+                "docstatus": 0,
+                "idx": 1,
+                "part": "TB-121-PART-2026-0021",
+                "part_name": "Tablet 10\" Display",
+                "unit_price": 3900.0,
+                "quantity": 1.0,
+                "total_price": 3900.0,
+                "parent": "JC-2026-00019",
+                "parentfield": "parts_used",
+                "parenttype": "Job Card",
+                "doctype": "Part Usage Entry"
+            }
+        ]
+    }
+}
+
+
+31. Session Cookie Auth vs Token Auth
+
+### Session Cookie Authentication
+
+Session cookie authentication is used when a user logs in through the browser.  
+After login, the server creates a session and sends a session cookie to the browser.  
+The browser automatically sends this cookie with every request.  
+This method is best for normal browser-based usage.
+
+---
+
+### Token Authentication
+
+Token authentication uses an API key and API secret instead of a login session.  
+The client sends the token in the request header to authenticate.  
+This method is mainly used for server-to-server communication or external integrations.
+
+---
+
+### When to Use Each
+
+Session cookies are appropriate for **browser users** interacting with the Frappe UI.  
+Token authentication is appropriate for **backend services, scripts, or external systems** calling the API.
+
+
