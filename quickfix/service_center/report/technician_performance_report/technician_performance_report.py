@@ -77,12 +77,11 @@ def get_data(filters):
     if filters.get("from_date") and filters.get("to_date"):
         job_filters["creation"] = ["between", [filters.get("from_date"), filters.get("to_date")]]
 
-    device_types = frappe.get_list("Device Type",fields=["name"])
+    device_types = frappe.get_list("Device Type",fields=["name"],debug=True)
     device_map = {
         dt.name: dt.name.lower()
         for dt in device_types
     }
-    
     jobs = frappe.get_list(
         "Job Card",
         filters=job_filters,

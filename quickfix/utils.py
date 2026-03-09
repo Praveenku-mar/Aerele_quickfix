@@ -126,6 +126,8 @@ def monthly_revenue_report():
         SELECT assigned_technician, parts_total, final_amount, labour_charge
         FROM `tabJob Card`
         WHERE status = 'Delivered'
+        AND creation >= DATE_FORMAT(CURDATE() - INTERVAL 1 MONTH, '%Y-%m-01')
+        AND creation < DATE_FORMAT(CURDATE(), '%Y-%m-01')
     """, as_dict=True)
 
     if not revenue:

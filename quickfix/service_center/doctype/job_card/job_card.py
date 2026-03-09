@@ -105,11 +105,11 @@ class JobCard(Document):
 	def notify_job_complete(self):
 		frappe.publish_realtime(
 			"job_ready",
-			message={
-				# "job_card":self.name,
-				"status":"Completed",
-				# "message":f"Job Card {self.name} is ready for delivery."
-			},
+			# message={
+			# 	"job_card":self.name,
+			# 	"status":"Completed",
+			# 	"message":f"Job Card {self.name} is ready for delivery."
+			# },
 			# user=frappe.session.user
 		)
 
@@ -133,11 +133,24 @@ class JobCard(Document):
 		invoice = frappe.get_doc("Service Invoice",{"job_card":in_name})
 		if invoice:
 			invoice.cancel()
+	
+	@frappe.whitelist()
+	def show_alert(self):
+		frappe.log_error("11111111")
+		frappe.publish_realtime("job_ready",{'message':"This Job Card is Ready for Delivery"})
+		return {"ok": True}
+
 		
 
 	
 
 	
+@frappe.whitelist()
+def show_alert():
+	frappe.publish_realtime("job_ready", {"message": "This Job Card is Ready for Delivery"})
+	return {"ok": True}
+
+
 def check_access_permission(user):
 	if user == "Administrator":
 		return ""
@@ -178,10 +191,6 @@ def get_technician(device_type):
 # 		frappe.show_alert("Technician specialization not matching with device type or is on Leave.")
 
 
-@frappe.whitelist()
-def show_alert():
-	frappe.log_error("11111111")
-	frappe.publish_realtime("job_ready",{'message':"This Job Card is Ready for Delivery"})
 
 
 

@@ -1,0 +1,23 @@
+{
+ "usr": "Administrator",
+ "pwd": "root"
+}
+
+http://quickfix-dev.localhost:8000/api/resource/Job Card
+http://quickfix-dev.localhost:8000/api/resource/Job Card/JC-2026-00019
+http://quickfix-dev.localhost:8000/api/resource/Spare Part
+
+
+http://quickfix-dev.localhost:8000/api/resource/Spare Part
+
+body :
+{
+    "part_name":"Battery",
+    "part_code":"PH-200",
+    "compatible_device_type":"Smartphone",
+    "unit_cost":2000,
+    "selling_price":3000,
+    "stock_qty":100,
+    "reorder_level":5,
+    "is_active":1
+}

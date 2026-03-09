@@ -140,6 +140,14 @@ frappe.ui.form.on("Job Card", {
 				frappe.msgprint(count);
 			},
 		});
+        frm.call('show_alert')
+        frappe.realtime.on("job_ready", (data) => {
+            console.log("out")
+                frappe.show_alert({
+                    message:("Job is Ready"),
+                    indicator: "green"
+                });
+        });
         frappe.db.get_single_value("QuickFix Settings", "default_labour_charge")
             .then(value => {
                 const labour = value || 0
