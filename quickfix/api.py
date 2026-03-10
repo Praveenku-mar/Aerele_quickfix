@@ -1,7 +1,7 @@
 import frappe
 from frappe.query_builder import DocType
 from frappe.utils import nowdate, now_datetime,now
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 
 @frappe.whitelist()
@@ -348,3 +348,58 @@ def bulk_insert_loop():
 
 # In [6]: insert_audit_logs_bulk()
 # Time :0.059677839279174805's
+
+
+@frappe.whitelist(allow_guest=True)
+def get_job_summary():
+	job_card = frappe.form_dict.get("job_card")
+	print(job_card)
+	if not job_card:
+		frappe.response['http_status_code'] = 404
+		return {"error":"Job Card name Required"}
+
+	data = frappe.db.get_value("Job Card",job_card,
+		['status','assigned_technician','labour_charge','parts_total','final_amount',"payment_status",'delivery_date'],
+		as_dict=True
+		)
+
+	if not data:
+		frappe.response['http_status_code'] = 404
+		return {"error":"Not found"}
+
+	return data
+
+rate_limit = 5
+
+@frappe.whitelist(allow_guest=True)
+def get_job_by_phone():
+	ip = frappe.local.request_ip or 'unknown'
+	cache_key = f"rate_limit:{ip}"
+
+	calls = frappe.cache().get(cache_key) or 0
+
+	if int(calls) >= rate_limit:
+		frappe.response["http_status_code"] = 429
+		return {"error": "Rate limit exceeded. Try again later."}
+
+	frappe.cache().set(cache_key, int(calls) + 1, 60)
+
+	phone = frappe.form_dict.get("phone_number")
+
+	if not phone:
+		frappe.response['http_status_code'] = 400
+		return {"error":"Phone number is required"}
+
+	job = frappe.db.get_value("Job Card",
+		{"customer_phone":phone},
+		[
+			"name","status","assigned_technician","delivery_date","final_amount",'labour_charge','parts_total'
+		],
+		as_dict=True
+	)
+
+	if not job:
+		frappe.response['http_status_code'] = 404
+		return {"error":"Not found"}
+
+	return job
