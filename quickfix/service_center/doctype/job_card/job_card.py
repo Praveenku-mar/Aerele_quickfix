@@ -213,3 +213,11 @@ def assign_technician(name,technician):
 @frappe.whitelist()
 def mark_delivered(doctype,name,fieldname,value):
 	frappe.set_value(doctype,name,fieldname,value)
+
+
+# @frappe.whitelist()
+# def back_ground():
+# 	frappe.enqueue(method="quickfix.service_center.doctype.job_card.job_card.get_job",queue="short",timeout=500,retry=Retry(max=3))
+
+# def get_job():
+# 	return frappe.get_doc("job Card","JC-2026-00001")

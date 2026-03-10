@@ -16,7 +16,7 @@ Only tables containing `JOB` in their name are included in the result.
 
 ---
 
-1. Run: frappe.db.sql("DESCRIBE `tabJob Card`", as_dict=True) and list 5 column names you recognise from your DocType fields.
+2. Run: frappe.db.sql("DESCRIBE `tabJob Card`", as_dict=True) and list 5 column names you recognise from your DocType fields.
 
 It returns the description of the table fields.  
 
@@ -29,20 +29,20 @@ It helps understand how the table is designed.
 ## DocStatus transitions
 
 
-2. Can you call `doc.save()` on a submitted document?  
+3. Can you call `doc.save()` on a submitted document?  
 
 You cannot normally call `doc.save()` on a submitted document because its `docstatus` is `1` (submitted) and Frappe prevents modification unless `allow_on_submit` is enabled.  
 Frappe raises a validation error at the document lifecycle layer.  
 
 ---
 
-3. What about `doc.submit()` on a cancelled document?
+4. What about `doc.submit()` on a cancelled document?
 
 You also cannot call `doc.submit()` on a cancelled document because its `docstatus` is `2`.  
 A cancelled document must be amended (which creates a new draft copy) before it can be submitted again.
 
 ---
-4. Why would you see a "Document has been modified after you have opened it" error
+5. Why would you see a "Document has been modified after you have opened it" error
 and how does Frappe prevent concurrent overwrites?
 
 This error appears when two users open the same document and one user saves changes before the other.  
@@ -52,7 +52,7 @@ If they do not match, Frappe throws a `TimestampMismatchError`.
 ---
 ## Dangerous patterns
 
-5. The following snippet has TWO bugs related to document lifecycle. Identify both and write the corrected version.
+6. The following snippet has TWO bugs related to document lifecycle. Identify both and write the corrected version.
 
 I found only one bug,
 ## Bugs
@@ -62,7 +62,7 @@ I found only one bug,
 --- 
 <!-- C1 - Device Type, Technician, Spare Part, QuickFix Setting -->
 
-6. When appending a row to `Job Card.parts_used` and saving, what 4 columns are auto-set?
+7. When appending a row to `Job Card.parts_used` and saving, what 4 columns are auto-set?
 
 Frappe automatically sets:
 
@@ -75,13 +75,13 @@ These link the child row to its parent.
 
 ---
 
-7. What is the DB table name for Part Usage Entry DocType?
+8. What is the DB table name for Part Usage Entry DocType?
 
 The table name will be "tabPart Usage Entry"
 
 ---
 
-8. If you delete row at idx=2 and re-save, what happens to remaining idx values?
+9. If you delete row at idx=2 and re-save, what happens to remaining idx values?
 
 Frappe reorders the rows automatically.  
 It renumbers `idx` values sequentially starting from 1.  
@@ -90,7 +90,7 @@ There will be no gaps in the index.
 ----
 
 
-9. After renaming a Technician record using Rename Document, does the `assigned_technician` field in linked Job Cards update automatically? Why? What does "track changes" mean here?
+10. After renaming a Technician record using Rename Document, does the `assigned_technician` field in linked Job Cards update automatically? Why? What does "track changes" mean here?
 
 Yes, the `assigned_technician` field updates automatically.  
 Frappe updates all Link fields in other documents that reference the renamed record.  
@@ -98,7 +98,7 @@ This happens because Rename Document updates references at the database level to
 
 ---
 
-10. What is the difference between setting a field as "unique" in the DocType versus using `frappe.db.exists()` inside `validate()`?
+11. What is the difference between setting a field as "unique" in the DocType versus using `frappe.db.exists()` inside `validate()`?
 
 
 Setting a field as **unique** creates a database-level unique constraint.  
@@ -110,7 +110,7 @@ It can fail under race conditions because two requests can pass validation befor
 `frappe.db.exists()` is weaker and not reliable for true uniqueness.
 ---
 
-11. Call self.save() inside on_update and see to the issues of it and explain them in the same readme_internals. Correct the pattern and explain it.
+12. Call self.save() inside on_update and see to the issues of it and explain them in the same readme_internals. Correct the pattern and explain it.
 
 
 If you call `self.save()` inside `on_update`, it causes infinite recursion.  
@@ -127,7 +127,7 @@ def validate(self):
 ```
 ---
 
-12 .What is the issue with using `frappe.get_all()` inside a whitelisted method exposed to guests or low-privilege users, especially regarding `permission_query_conditions`?
+13 .What is the issue with using `frappe.get_all()` inside a whitelisted method exposed to guests or low-privilege users, especially regarding `permission_query_conditions`?
 
 `frappe.get_all()` ignores user permissions by default.  
 It does not apply `permission_query_conditions` defined for the DocType.  
@@ -135,7 +135,7 @@ If exposed in a guest-accessible or low-privilege whitelisted method, it can ret
 
 ---
 
-13. Why is `doc_events` safer than `override_doctype_class` for most use cases?
+14. Why is `doc_events` safer than `override_doctype_class` for most use cases?
 
 `doc_events` attaches logic to specific lifecycle hooks without replacing the core DocType class.  
 It keeps the standard behavior intact and only adds extra logic where needed.  
@@ -145,23 +145,23 @@ If you miss internal logic from the base class, you can break validations, permi
 
 `doc_events` is additive and low risk.  
 `override_doctype_class` is invasive and easier to misuse.
-
-13.Multiple `validate` Handlers on Job Card
+---
+15.Multiple `validate` Handlers on Job Card
 
 When two `validate` handlers exist:
 
 - The `validate()` method inside the main DocType controller runs first.  
 - The `validate` function registered through `doc_events` runs after that.
-
-14. What If Both Raise `frappe.ValidationError`?
+---
+16. What If Both Raise `frappe.ValidationError`?
 
 Execution stops immediately when the first `frappe.ValidationError` is raised.  
 The second handler will not run.  
 Frappe aborts the request at the first thrown validation exception.  
 Only one error is returned to the browser — the one raised first.
 
-
-15. `app_include_js` vs `web_include_js`
+---
+17. `app_include_js` vs `web_include_js`
 
 ### Difference
 
@@ -182,8 +182,8 @@ Use `web_include_js` when adding frontend scripts for public pages, portals, lan
 Desk customization belongs in `app_include_js`.  
 Public website behavior belongs in `web_include_js`.
 
-
-16. `doctype_js`, `doctype_list_js`, and `doctype_tree_js`
+---
+18. `doctype_js`, `doctype_list_js`, and `doctype_tree_js`
 
 ### `doctype_js` (Job Card)
 
@@ -209,7 +209,7 @@ These DocTypes have parent-child relationships and are displayed as expandable t
 Job Card does not use tree view because it is a flat transactional document, not hierarchical data.
 ---
 
-17. `override_whitelisted_methods` vs Monkey Patching
+19. `override_whitelisted_methods` vs Monkey Patching
 
 `override_whitelisted_methods` is a hook-based override defined in `hooks.py`.  
 It explicitly replaces a whitelisted method with your own implementation.  
@@ -225,14 +225,14 @@ Use monkey patching only in rare edge cases where no hook exists and you fully c
 In production application, Monkey patching is risky and not recommended.
 ---
 
-18. . What If Two Apps Override the Same Whitelisted Method?
+20. . What If Two Apps Override the Same Whitelisted Method?
 
 If two apps register `override_whitelisted_methods` for the same method, the app loaded last takes precedence.  
 This can create conflicts and unpredictable behavior if not managed carefully.
 
 ---
 
-19. Signature Mismatch and TypeError
+21. Signature Mismatch and TypeError
 
 When overriding a method, your replacement must have the exact same function signature (same arguments).  
 If the original method expects arguments like:
@@ -240,7 +240,7 @@ If the original method expects arguments like:
 def get_data(docname, user=None):
 ```
 ---
-20. Calling `frappe.call` inside `validate` (before_save)
+22. Calling `frappe.call` inside `validate` (before_save)
 
 Calling `frappe.call` inside the client-side `validate` event does not work reliably because `validate` runs synchronously before the document is saved.  
 `frappe.call` is asynchronous by default, so the server response may not return before the save continues.  
@@ -248,7 +248,7 @@ This creates race conditions where validation logic depends on data that has not
 As a result, the document may save before the async check completes.
 ---
 
-21. ## Tree DocType
+23. ## Tree DocType
 
 A Tree DocType represents hierarchical data stored in parent-child structure.  
 Examples include Account, Cost Center, Item Group, or an Employee reporting hierarchy.  
@@ -274,8 +274,8 @@ A Tree DocType must include:
 
 Without these, Frappe cannot maintain or render the hierarchical structure properly.
 
-
-22. Client Script DocType vs Shipped JS (App-Level)
+---
+24. Client Script DocType vs Shipped JS (App-Level)
 
 ### Tradeoffs
 
@@ -309,8 +309,9 @@ frappe.ui.form.on("Job Card", {
         }
     }
 });
-
-23. ## Prepared Report vs Real-Time Script Report
+```
+---
+25.  Prepared Report vs Real-Time Script Report
 
 ### When to Use Prepared Report
 
@@ -328,14 +329,14 @@ The result always reflects the current data in the database.
 
 Prepared Reports can become **stale** because they show the data from the time the report was generated.  
 If new records are added or updated later, the prepared report will not include those changes.
-
-24 . Caching Risk
+---
+26 . Caching Risk
 
 If the underlying data changes after the report is prepared, the user still sees the **old stored result**.  
 The report will only show updated data after it is prepared again.
 
-
-25. Avoid `frappe.get_all()` Inside Jinja Templates
+---
+27. Avoid `frappe.get_all()` Inside Jinja Templates
 
 Calling `frappe.get_all()` directly inside a Jinja template is bad practice.  
 Templates should only display data, not run database queries.  
@@ -354,8 +355,9 @@ def before_print(self):
         filters={"assigned_technician": self.assigned_technician},
         fields=["name", "status"]
     )
-
-26. Raw Printing vs HTML-PDF Printing (WeasyPrint)
+```
+---
+28. Raw Printing vs HTML-PDF Printing (WeasyPrint)
 
 ### Raw Printing (ESC/POS)
 
@@ -384,8 +386,8 @@ Examples include:
 - `grid layout` (`display: grid`)
 
 These layouts may render correctly in browsers but break or behave differently in WeasyPrint PDFs.
-
-27 .  Disabling the Scheduler for a Specific Site
+---
+29.  Disabling the Scheduler for a Specific Site
 
 You can disable the scheduler for a site by running:
 
@@ -411,8 +413,8 @@ They are not executed while the worker is offline.
 When the worker starts again, it picks up the queued jobs and begins processing them.  
 So the jobs are delayed, not lost.
 
-
-28. Task A - N+1 query detection and fix:
+---
+30. Task A - N+1 query detection and fix:
 The following code has an N+1 query problem. Identify it and rewrite it:
 # N+1 PROBLEM - fix this
 job_cards = frappe.get_all("Job Card", fields=["name","assigned_technician"])
@@ -427,8 +429,8 @@ for job in job_card:
     tech_name,tech_phone = frappe.db.get_value("Technician",job,fields=["technician_name","phone"])
     print(tech_name,tech_phone)
 
-
-29. Why You Should Not Add a Search Index to Every Field
+---
+31. Why You Should Not Add a Search Index to Every Field
 
 Adding an index to every field is unnecessary and harmful.  
 Indexes improve **read/search speed**, but they slow down **write operations** like insert, update, and delete.
@@ -444,9 +446,9 @@ If too many indexes exist, each write operation becomes slower and consumes more
 
 Indexes should only be added to fields that are **frequently searched, filtered, or used in joins**.
 
+---
 
-
-30. API Response 
+32. API Response 
 
 ## DELETE
 
@@ -564,7 +566,7 @@ http://quickfix-dev.localhost:8000/api/resource/Job Card/JC-2026-00019
     }
 }
 
-
+---
 31. Session Cookie Auth vs Token Auth
 
 ### Session Cookie Authentication
@@ -588,5 +590,33 @@ This method is mainly used for server-to-server communication or external integr
 
 Session cookies are appropriate for **browser users** interacting with the Frappe UI.  
 Token authentication is appropriate for **backend services, scripts, or external systems** calling the API.
+---
 
+32. Explain retry behavior: how many times does Frappe retry a failed background job by
+default?
+
+If a background job fails, it will not retry automatically. The job is marked Failed immediately.
+
+---
+33.  Risks of `allow_guest=True` Endpoints
+
+`allow_guest=True` allows anyone on the internet to call that API without logging in.  
+This removes authentication protection, so the endpoint must be extremely careful about what it exposes.
+
+### 1. Data Leakage
+
+Attackers can call the endpoint repeatedly and extract sensitive information such as customer data, phone numbers, or internal records if the method returns database results.
+
+### 2. Abuse / Spam Requests
+
+Since no login is required, attackers can send thousands of requests (bots or scripts).  
+This can overload the server, trigger heavy database queries, or create denial-of-service conditions.
+
+### 3. Unauthorized Data Manipulation
+
+If the endpoint allows creating or updating records, attackers can insert fake data, modify records, or corrupt system data without any authentication.
+
+### Conclusion
+
+Guest endpoints must strictly validate input, limit what data is returned, and avoid write operations whenever possible.
 

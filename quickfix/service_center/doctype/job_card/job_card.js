@@ -130,6 +130,10 @@ frappe.ui.form.on("Job Card", {
     
     },
     onload(frm) {
+        //Background failure jobs
+        // frappe.call({
+        //     method:"quickfix.service_center.doctype.job_card.job_card.back_ground"
+        // })
         frappe.call({
 			method: "frappe.client.get_count",
 			args: {
@@ -230,8 +234,3 @@ function calculate_total_amount(frm) {
     frm.set_value("final_amount", parts_total + labour)
 }
 
-// frappe.realtime.on("job_ready", async function(data) {
-//     console.log("222222222222222222222222222");
-//     // frappe.msgprint("ytcdytcytfy");
-//     console.log(data);
-// });
