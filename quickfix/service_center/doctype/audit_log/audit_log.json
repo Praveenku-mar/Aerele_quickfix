@@ -10,7 +10,8 @@
   "document_id",
   "action",
   "user",
-  "timestamp"
+  "timestamp",
+  "webhook_id"
  ],
  "fields": [
   {
@@ -45,12 +46,17 @@
    "fieldname": "timestamp",
    "fieldtype": "Datetime",
    "label": "Timestamp"
+  },
+  {
+   "fieldname": "webhook_id",
+   "fieldtype": "Data",
+   "label": "Webhook Id"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-25 18:17:21.908107",
+ "modified": "2026-03-10 16:21:25.119990",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Audit Log",

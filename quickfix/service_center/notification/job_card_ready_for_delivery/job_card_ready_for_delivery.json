@@ -1,0 +1,32 @@
+{
+ "attach_files": "",
+ "attach_print": 0,
+ "channel": "Email",
+ "condition": "doc.status == \"Ready For Delivery\"",
+ "creation": "2026-03-11 12:02:52.439645",
+ "days_in_advance": 0,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Job Card",
+ "enabled": 1,
+ "event": "Save",
+ "idx": 0,
+ "is_standard": 1,
+ "message": "<p>Dear {{ doc.customer_name}},</p>\n\n<p>We are pleased to inform you that your {{doc.device_type}} is ready for delivery.</p>\n\n<p>Job Card: {{ doc.name }} <br>\nStatus: {{ doc.status }}\n\n<p>Please visit us at your earliest convenience to collect it.</p>\n\n<p>Thank you for choosing us.</p>\n\n<p>Regards,\n{{  \"QuickFix Service Center\" }}</p>\n",
+ "message_type": "Markdown",
+ "modified": "2026-03-11 12:08:21.715836",
+ "modified_by": "Administrator",
+ "module": "Service Center",
+ "name": "Job Card Ready for Delivery",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "receiver_by_document_field": "customer_email"
+  }
+ ],
+ "send_system_notification": 0,
+ "send_to_all_assignees": 0,
+ "sender": "Praveenkumar",
+ "sender_email": "praveensekar223@gmail.com",
+ "subject": "Your Job Card {{ doc.name }} is Ready for Delivery"
+}

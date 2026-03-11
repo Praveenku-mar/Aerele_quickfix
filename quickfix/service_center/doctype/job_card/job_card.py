@@ -5,6 +5,8 @@ import frappe
 from frappe.model.document import Document
 import re
 from datetime import datetime
+from frappe.utils.pdf import get_pdf
+from frappe.utils.file_manager import get_file
 
 class JobCard(Document):
 	def validate(self):
@@ -15,15 +17,19 @@ class JobCard(Document):
 		self.set_total_cost()
 
 	def before_submit(self):
+		if not self.delivery_date:
+			frappe.throw("Please select the delivery date.")
 		self.validate_submit()
 		self.check_stock()	
 		self.status = "Delivered"
 
 	def on_submit(self):
+		
 		self.stock_update()
 		self.create_invoice()
 		self.notify_job_complete()
 		self.send_job_ready_mail()
+		self.send_pft_job()
 		# frappe.db.commit()
 	
 	def on_cancel(self):
@@ -37,6 +43,9 @@ class JobCard(Document):
 
 	def before_print(self, print_settings=None):
 		self.print_summary = f"{self.customer_name} - {self.device_type} {self.device_brand}"
+
+	def on_update(self):
+		frappe.cache.delete_value("job_card_status_chart")
 
 	#Validate Hook
 	def validate_phone(self):
@@ -120,6 +129,19 @@ class JobCard(Document):
 			timeout=300,
 			job_name=f"Send Job Ready Email - {self.name}",
 			job_card=self.name
+		)
+
+	def send_pft_job(self):
+		pdf = frappe.get_print(self.doctype, self.name, print_format="Job Card Receipt", as_pdf=True)
+		frappe.log_error("1111")
+		# pdf = get_pdf(message)
+		frappe.sendmail(recipients=[self.customer_email],
+			subject="Job Card Submitted",
+			message="Please find the attached Job Card PDF.",
+			attachments=[{
+				"fname":f"{self.name}-invoice.pdf",
+				"fcontent":pdf
+			}]
 		)
 
 	#On cancel Hook

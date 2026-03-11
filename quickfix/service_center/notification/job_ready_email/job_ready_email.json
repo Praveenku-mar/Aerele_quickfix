@@ -1,0 +1,32 @@
+{
+ "attach_files": "",
+ "attach_print": 0,
+ "channel": "Email",
+ "condition": "doc.status == \"Ready For Delivery\"",
+ "creation": "2026-03-11 12:02:31.062282",
+ "days_in_advance": 0,
+ "docstatus": 0,
+ "doctype": "Notification",
+ "document_type": "Job Card",
+ "enabled": 1,
+ "event": "Save",
+ "idx": 0,
+ "is_standard": 1,
+ "message": "Dear {{ doc.customer_name or \"Customer\" }},\n\nWe are pleased to inform you that your vehicle / job is ready for delivery.\n\nJob Card: {{ doc.name }}\nStatus: {{ doc.status }}\n{% if doc.expected_delivery_date %}\nExpected Delivery Date: {{ frappe.format(doc.expected_delivery_date, {\"fieldtype\": \"Date\"}) }}\n{% endif %}\n\nPlease visit us at your earliest convenience to collect it.\n\nThank you for choosing us.\n\nRegards,\n{{ doc.company or \"Our Service Team\" }}",
+ "message_type": "Markdown",
+ "modified": "2026-03-11 12:02:31.062282",
+ "modified_by": "Administrator",
+ "module": "Service Center",
+ "name": "Job Ready Email",
+ "owner": "Administrator",
+ "recipients": [
+  {
+   "receiver_by_document_field": "customer_email"
+  }
+ ],
+ "send_system_notification": 0,
+ "send_to_all_assignees": 0,
+ "sender": "Praveenkumar",
+ "sender_email": "praveensekar223@gmail.com",
+ "subject": "Your Job Card {{ doc.name }} is Ready for Delivery"
+}

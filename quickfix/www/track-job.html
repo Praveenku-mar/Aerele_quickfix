@@ -44,9 +44,9 @@
             <p><strong>Payment Status:</strong> {{ job.payment_status }}</p>
             {% set tech = frappe.db.get_value("Technician",job.assigned_technician,"technician_name")%}
             <p><strong>Assigned Technician:</strong> {{  tech}}</p>
-            <p><strong>Parts Total Amount:</strong> {{ job.parts_total }}</p>
-            <p><strong>Labour Charge:</strong> {{ job.labour_charge }}</p>
-            <p><strong>Total Amount:</strong> {{ job.final_amount }}</p>
+            <!-- <p><strong>Parts Total Amount: ₹</strong> {{ frappe.format_value(job.parts_total) }}</p>
+            <p><strong>Labour Charge: ₹</strong> {{ frappe.format_value(job.labour_charge) }}</p>
+            <p><strong>Total Amount: ₹</strong> {{ frappe.format_value(job.final_amount) }}</p> -->
         {% else %}
             <p style="color:red;">Invalid Job ID</p>
         {% endif %}
