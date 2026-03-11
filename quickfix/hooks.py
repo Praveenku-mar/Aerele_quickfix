@@ -170,9 +170,9 @@ override_doctype_class = {
 # # Hook on document methods and events
 
 doc_events = {
-    # "Job Card":{
-    #     "on_validate":"quickfix.audit.log_change"
-    # },
+    "Job Card":{
+        "on_submit":"quickfix.api.web_hook"
+    },
     "*" :{
         "on_validate":"quickfix.audit.log_change",
         "on_update": "quickfix.audit.log_change",

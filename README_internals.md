@@ -620,3 +620,95 @@ If the endpoint allows creating or updating records, attackers can insert fake d
 
 Guest endpoints must strictly validate input, limit what data is returned, and avoid write operations whenever possible.
 
+---
+
+34. Server Script Sandbox – Analysis
+
+### Python Functions / Modules Blocked
+
+Server Scripts run inside a restricted sandbox.  
+Many Python modules are blocked for security reasons.
+
+Examples of blocked modules/functions include:
+- `os` (file system access)
+- `subprocess` (running system commands)
+- `socket` (network access)
+- `open()` for reading/writing files
+- `import` of unsafe system modules
+
+These restrictions prevent server scripts from accessing the OS or executing arbitrary commands.
+
+---
+
+### 3 Things You Cannot Do in Server Script (but can in App Code)
+
+1. Access the operating system or file system (`os`, file read/write).  
+2. Run shell commands or external programs (`subprocess`).  
+3. Import arbitrary Python libraries or install dependencies.
+
+App code has full Python capability, while Server Scripts run in a restricted environment.
+
+---
+
+### When Server Scripts Are Acceptable
+
+1. Small business logic changes such as validating a field or auto-setting a value.  
+2. Quick automation like sending a notification or updating a field when a document is saved.
+
+These are lightweight and low-risk modifications.
+
+---
+
+### When You Should Use App Code Instead
+
+1. Complex business logic involving multiple DocTypes, heavy queries, or integrations.  
+2. Features requiring version control, testing, or long-term maintenance.
+
+These require structured development and deployment.
+
+---
+
+### Governance / Maintainability Risk
+
+Server Scripts are stored in the database, not in the app repository.  
+They can be edited directly in production without code review.  
+This makes auditing changes difficult and increases the risk of hidden logic or accidental breakage.
+
+Over time, too many server scripts create "shadow code" that is hard to maintain and migrate.
+
+---
+
+35. Frappe Cache 
+
+### 1. `frappe.cache.get_value("bootinfo")`
+
+`bootinfo` contains data sent to the browser when the Desk loads.  
+It includes user information, roles, permissions, system defaults, installed apps, and workspace settings needed to initialize the UI.
+
+---
+
+### 2. `frappe.cache.get_value("quickfix:translations")`
+
+Translations are cached in Redis to avoid loading language files repeatedly.  
+Frappe stores translated labels and messages so UI text can be quickly returned based on the user's selected language.
+
+---
+
+### 3. Running `frappe.clear_cache()`
+
+When `frappe.clear_cache()` is executed:
+
+- Cached metadata and permissions are cleared.
+- The next browser reload forces Frappe to rebuild cache data.
+- Desk may reload menus, roles, and workspace information again.
+- This ensures the system reflects recent changes.
+
+---
+
+## 5 Things Frappe Caches in Redis
+
+1. **Bootinfo** – Data used to initialize the Desk UI.  
+2. **DocType Metadata (meta)** – Field definitions, permissions, and DocType structure.  
+3. **Website Context** – Website configuration and routing data.  
+4. **Translations** – Language labels and translated UI text.  
+5. **User Permissions** – Cached permission rules for faster access control checks.

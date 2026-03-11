@@ -3,6 +3,9 @@ from frappe.query_builder import DocType
 from frappe.utils import nowdate, now_datetime,now
 from datetime import datetime, timedelta
 import time
+import requests
+import hashlib
+
 
 @frappe.whitelist()
 def get_job_summary():
@@ -205,30 +208,35 @@ def custom_get_count(doctype,filters=None, debug=False, cache=False):
 
 @frappe.whitelist()
 def get_status_chart_data():
+	cache_key = "job_card_status_chart"
+	data = frappe.cache.get_value(cache_key)
 
-    data = frappe.db.sql("""
-        SELECT status, COUNT(name) as total
-        FROM `tabJob Card`
-        GROUP BY status
-    """, as_list=True)
+	if not data:
 
-    labels = []
-    values = []
+		data = frappe.db.sql("""
+			SELECT status, COUNT(name) as total
+			FROM `tabJob Card`
+			GROUP BY status
+			""", as_list=True
+			)
+		frappe.cache.set_value(cache_key,data,expires_in_sec=300)
+	labels = []
+	values = []
 
-    for d in data:
-        labels.append(d[0])
-        values.append(d[1])
+	for d in data:
+		labels.append(d[0])
+		values.append(d[1])
 
-    return {
-        "labels": labels,
-        "datasets": [
-            {
-                "name": "Job Count",
-                "values": values
-            }
-        ],
-        "type": "bar"
-    }
+	return {
+		"labels": labels,
+		"datasets": [
+			{
+				"name": "Job Count",
+				"values": values
+			}
+		],
+		"type": "bar"
+	}
 
 
 # @frappe.whitelist(allow_guest=True)
@@ -403,3 +411,67 @@ def get_job_by_phone():
 		return {"error":"Not found"}
 
 	return job
+
+
+
+def web_hook(doctype,method):
+	frappe.enqueue(
+        "quickfix.api.send_webhook",
+        job_card_name=doctype.name,
+        retry=0
+    )
+
+
+def send_webhook(job_card_name,retry=0):
+	
+	settings = frappe.get_single("QuickFix Settings")
+
+	if not settings.webhook_url:
+		return
+
+	doc = frappe.get_doc("Job Card",job_card_name)
+
+	payload = {
+		"event":"job_submitted",
+		"job_card":doc.name,
+		"customer":doc.customer_name,
+		"amount":doc.final_amount
+	}
+
+	webhook_id = hashlib.sha256(
+		f"{doc.name}-job_submitted".encode()
+	).hexdigest()
+
+	exists = frappe.db.exists("Audit Log",{"webhook_id":webhook_id})
+	if exists:
+		return
+
+	try:
+		r = requests.post(
+			settings.webhook_url,
+			json=payload,
+			timeout=5
+		)
+		r.raise_for_status()
+
+		frappe.get_doc({
+			"webhook_id":webhook_id,
+			"doctype":"Audit Log",
+			"doctype_name":"Job Card",
+			"action":"webhook_send",
+			"user":frappe.session.user,
+			"timestamp":now()
+		}).insert(ignore_permissions=True)
+
+	except Exception as e:
+		frappe.log_error(f"webhook failed: {e}","Webhook Error")
+
+		if retry < 3:
+			frappe.enqueue(
+				"quickfix.api.send_webhook",
+				job_card_name = job_card_name,
+				enqueue_after_commit=True,
+				queue="default",
+				timeout=300,
+				delay=60
+			)
