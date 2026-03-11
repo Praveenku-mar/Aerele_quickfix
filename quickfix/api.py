@@ -5,6 +5,8 @@ from datetime import datetime, timedelta
 import time
 import requests
 import hashlib
+import hmac
+import json
 
 
 @frappe.whitelist()
@@ -415,14 +417,21 @@ def get_job_by_phone():
 
 
 def web_hook(doctype,method):
+	id = f"{doctype.name}:job_submitted:{int(time.time())}"
+	webhook_id = hashlib.sha256(id.encode()).hexdigest()
+
+	frappe.log_error("webhook_id",webhook_id)
 	frappe.enqueue(
         "quickfix.api.send_webhook",
+		queue="default",
+		timeout=30,
         job_card_name=doctype.name,
-        retry=0
+        retry=0,
+		webhook_id=webhook_id
     )
 
 
-def send_webhook(job_card_name,retry=0):
+def send_webhook(job_card_name,webhook_id,retry=0):
 	
 	settings = frappe.get_single("QuickFix Settings")
 
@@ -438,12 +447,7 @@ def send_webhook(job_card_name,retry=0):
 		"amount":doc.final_amount
 	}
 
-	webhook_id = hashlib.sha256(
-		f"{doc.name}-job_submitted".encode()
-	).hexdigest()
-
-	exists = frappe.db.exists("Audit Log",{"webhook_id":webhook_id})
-	if exists:
+	if frappe.db.exists("Audit Log",{"webhook_id":webhook_id}):
 		return
 
 	try:
@@ -455,13 +459,15 @@ def send_webhook(job_card_name,retry=0):
 		r.raise_for_status()
 
 		frappe.get_doc({
-			"webhook_id":webhook_id,
 			"doctype":"Audit Log",
 			"doctype_name":"Job Card",
-			"action":"webhook_send",
+			"document_id":job_card_name,
+			"action":"on_submitted",
 			"user":frappe.session.user,
-			"timestamp":now()
+			"timestamp":now(),
+			"webhook_id":webhook_id
 		}).insert(ignore_permissions=True)
+		frappe.db.commit()
 
 	except Exception as e:
 		frappe.log_error(f"webhook failed: {e}","Webhook Error")
@@ -475,3 +481,63 @@ def send_webhook(job_card_name,retry=0):
 				timeout=300,
 				delay=60
 			)
+
+
+
+
+
+@frappe.whitelist(allow_guest=True)
+def payment_webhook():
+
+	# 1. Read raw request body
+	payload = frappe.request.data
+
+	# 2. Validate HMAC signature
+	secret = frappe.conf.get("payment_webhook_secret", "")
+	signature = frappe.get_request_header("X-Signature")
+
+	expected = hmac.new(
+		secret.encode(),
+		payload,
+		hashlib.sha256
+	).hexdigest()
+
+
+	print("==================================",expected)
+	print("=================================",signature)
+	if not signature or not hmac.compare_digest(expected, signature):
+		frappe.throw("Invalid signature", frappe.AuthenticationError)
+
+	# 3. Parse payload
+	data = json.loads(payload)
+
+	ref = data.get("ref")
+	amount = data.get("amount")
+
+	# 4. Deduplication check
+	if frappe.db.exists(
+		"Audit Log",
+		{"action": "payment_received", "document_name": ref}
+	):
+		return {"status": "duplicate", "message": "Already processed"}
+
+	# 5. Update Job Card payment status
+	job = frappe.get_doc("Job Card", ref)
+	job.payment_status = "Paid"
+	job.paid_amount = amount
+	job.save(ignore_permissions=True)
+
+	# 6. Log to Audit Log
+	frappe.get_doc({
+		"doctype": "Audit Log",
+		"doctype_name":"Job Card",
+		"action": "payment_received",
+		"document_id": ref,
+		"user": "Administrator",
+		"timestamp": now()
+
+	}).insert(ignore_permissions=True)
+
+	frappe.db.commit()
+
+	return {"status": "ok"}

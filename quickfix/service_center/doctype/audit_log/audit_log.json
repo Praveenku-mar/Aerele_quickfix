@@ -10,8 +10,8 @@
   "document_id",
   "action",
   "user",
-  "timestamp",
-  "webhook_id"
+  "webhook_id",
+  "timestamp"
  ],
  "fields": [
   {
@@ -28,13 +28,15 @@
   {
    "fieldname": "action",
    "fieldtype": "Data",
-   "label": "Action"
+   "label": "Action",
+   "read_only": 1
   },
   {
    "fieldname": "user",
    "fieldtype": "Link",
    "label": "User",
-   "options": "User"
+   "options": "User",
+   "read_only": 1
   },
   {
    "fieldname": "document_id",
@@ -45,18 +47,20 @@
   {
    "fieldname": "timestamp",
    "fieldtype": "Datetime",
-   "label": "Timestamp"
+   "label": "Timestamp",
+   "read_only": 1
   },
   {
    "fieldname": "webhook_id",
    "fieldtype": "Data",
-   "label": "Webhook Id"
+   "label": "Webhook Id",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-03-10 16:21:25.119990",
+ "modified": "2026-03-11 15:26:20.424931",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Audit Log",
