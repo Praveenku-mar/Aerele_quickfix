@@ -23,18 +23,30 @@ def generate_qr_code(data):
 
     return qr_base64
 
+    
+
 def check_low_stock():
-    last_run = frappe.db.get_value("Audit Log",
-        {"action":"low_stock_check","timestamp":["like", f"{today()}%"]}, "name")
-    frappe.log_error("run",today())
-    if last_run:
-        frappe.log_error("last",last_run)
+
+    today_date = today()
+
+    if frappe.db.exists(
+        "Audit Log",
+        {
+            "action": "low_stock_check",
+            "timestamp": ["like", today_date + "%"]
+        },
+        "name"
+    ):
         return
+
     low_parts = frappe.db.sql("""
-        SELECT name, part_name, stock_qty,reorder_level
+        SELECT name, part_name, stock_qty, reorder_level
         FROM `tabSpare Part`
         WHERE stock_qty <= reorder_level
     """, as_dict=True)
+
+    if not low_parts:
+        return
 
     html = """
             <div style="font-family: Arial, sans-serif; background:#f4f6f9; padding:20px;">

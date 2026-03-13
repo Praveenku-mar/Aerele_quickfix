@@ -712,3 +712,157 @@ When `frappe.clear_cache()` is executed:
 3. **Website Context** – Website configuration and routing data.  
 4. **Translations** – Language labels and translated UI text.  
 5. **User Permissions** – Cached permission rules for faster access control checks.
+
+
+---
+36. JS Change Showing Old Version
+
+If the browser shows old JavaScript after a change, it means the asset cache is still being used.
+
+**Command to clear asset cache**
+```
+bench clear-cache
+```
+
+This clears server-side cache so the system reloads fresh data.
+
+**Role of `bench build --app quickfix`**
+```
+bench build --app quickfix
+```
+
+
+This rebuilds the frontend assets (JS, CSS) for the `quickfix` app.  
+It compiles and bundles the updated files so the browser can load the new version.
+
+---
+
+## DocType Change Showing Old Field Labels
+
+If users still see old field labels after a DocType change, the **DocType metadata cache** is still cached.
+
+**Command to clear metadata cache**
+```
+bench --site quickfix-dev.localhost clear-cache
+```
+
+or
+
+```
+bench migrate
+```
+
+This clears cached DocType metadata so the system reloads the updated field definitions.
+
+----
+
+37.  Private File Access Test
+
+### Access via `/files/filename.pdf`
+
+If a file is uploaded as a **private attachment**, accessing it through:
+```
+bench clear-cache
+```
+
+This clears server-side cache so the system reloads fresh data.
+
+**Role of `bench build --app quickfix`**
+```
+bench build --app quickfix
+```
+
+This rebuilds the frontend assets (JS, CSS) for the `quickfix` app.  
+It compiles and bundles the updated files so the browser can load the new version.
+
+---
+
+## DocType Change Showing Old Field Labels
+
+If users still see old field labels after a DocType change, the **DocType metadata cache** is still cached.
+
+**Command to clear metadata cache**
+```
+bench --site site-name clear-cache
+```
+or 
+```
+bench migrate
+```
+
+This clears cached DocType metadata so the system reloads the updated field definitions.
+
+38. # README_internals.md
+
+## Hardcoding API Keys in Python Source Code
+
+Hardcoding API keys directly inside Python source files is a major security risk.
+
+If the code repository is shared, pushed to GitHub, or accessed by another developer, the API key becomes visible. Anyone with access to the repository can misuse the key.
+
+It also makes secret rotation difficult. Changing the key would require modifying the source code and redeploying the entire application.
+
+For these reasons, API keys and other secrets must never be stored directly in application source code.
+
+---
+
+## Reading Secrets from `site_config.json`
+
+A safer approach is to store secrets in configuration files instead of embedding them in the code.
+
+In Frappe applications, secrets can be accessed using:
+
+```python
+api_key = frappe.conf.get("payment_api_key")
+```
+
+This reads the value from `site_config.json`, which is specific to each site.
+
+Example `site_config.json` entry:
+
+```json
+{
+  "payment_api_key": "your-secret-key"
+}
+```
+
+This approach keeps sensitive credentials outside the codebase and allows different environments (development, staging, production) to use different keys without modifying the code.
+
+---
+
+## Why Secrets Should Never Be in `common_site_config.json`
+
+`common_site_config.json` is shared across all sites within the same Frappe bench.
+
+If secrets are stored in this file:
+
+- Every site in that bench can access the secret.
+- Development or testing sites might accidentally use production credentials.
+- A compromised site could access credentials belonging to another site.
+
+Because of this shared scope, storing sensitive keys in `common_site_config.json` increases the risk of cross-site credential exposure.
+
+---
+
+## Risk of Committing `site_config.json` to Git
+
+The `site_config.json` file commonly contains sensitive information such as:
+
+- Database credentials  
+- API keys  
+- Third-party integration tokens  
+- Encryption secrets  
+
+If this file is committed to a Git repository, the secrets become part of the repository history. Anyone with access to the repository can retrieve them.
+
+Even if the file is removed later, the secrets may still exist in previous commits.
+
+To prevent this, `site_config.json` must always be excluded using `.gitignore`.
+
+Example `.gitignore` entry:
+
+```
+sites/*/site_config.json
+```
+
+This ensures sensitive configuration files are never tracked or pushed to version control.

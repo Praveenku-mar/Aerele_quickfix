@@ -10,15 +10,19 @@ from frappe.utils.file_manager import get_file
 
 class JobCard(Document):
 	def validate(self):
-		self.final = self.final_amount
+		self.final = self.final_amount or 0
 		self.validate_phone()
 		self.check_technician()
 		self.set_total_part_cost()
 		self.set_total_cost()
+		self.estimated_cost_validation()
 
 	def before_submit(self):
 		if not self.delivery_date:
 			frappe.throw("Please select the delivery date.")
+
+		if self.status != "Ready For Delivery":
+			frappe.throw("Job is not ready for delivery.")
 		self.validate_submit()
 		self.check_stock()	
 		self.status = "Delivered"
@@ -49,22 +53,33 @@ class JobCard(Document):
 
 	#Validate Hook
 	def validate_phone(self):
-		phone = self.customer_phone
+		phone = str(self.customer_phone or "")
 		if not re.fullmatch(r"\d{10}",phone):
 			frappe.throw("Customer phone number must contain exactly 10 digits.")
 
 	@frappe.whitelist()
 	def check_technician(self):
-		frappe.log_error("Check Technician")
-		req_status = ["In Repair","Ready For Delivery","Delivered","Cancelled"]
-		exits= frappe.db.exists("Technician", {
-			"name": self.assigned_technician,
-			"status": "Active"
-			})
-		if not exits:
-			frappe.throw(f"{self.assigned_technician} Technician is on Leave.")
-		if self.status in req_status and not self.assigned_technician:
+
+		# if not self.assigned_technician:
+		# 	frappe.throw("")
+		required_status = ["In Repair", "Ready For Delivery", "Delivered"]
+
+		if self.status in required_status and not self.assigned_technician:
 			frappe.throw("Assigned Technician is mandatory for this status.")
+
+
+		exists = frappe.db.exists(
+			"Technician",
+			{
+				"name": self.assigned_technician,
+				"status": "Active"
+			}
+		)
+
+		if not exists:
+			frappe.throw(f"{self.assigned_technician} Technician is on Leave.")
+
+		
 
 	def set_total_part_cost(self):
 		for row in self.parts_used:
@@ -81,6 +96,10 @@ class JobCard(Document):
 		self.labour_charge = lab_cost
 		self.parts_total = total
 		self.final_amount = lab_cost + total
+
+	def estimated_cost_validation(self):
+		if self.status == "In Repair" and not self.estimated_cost:
+			frappe.throw("Estimated Cost is required")
 
 	#Before save hook
 	def validate_submit(self):
@@ -110,6 +129,7 @@ class JobCard(Document):
 		invoice.total_amount = self.final_amount
 		invoice.payment_status = "Unpaid"
 		invoice.insert(ignore_permissions=True)
+		print(invoice.name)
 
 	def notify_job_complete(self):
 		frappe.publish_realtime(
@@ -123,6 +143,9 @@ class JobCard(Document):
 		)
 
 	def send_job_ready_mail(self):
+		#skip during automated tests
+		if frappe.flags.in_test:
+			return
 		frappe.enqueue(
 			method="quickfix.api.send_job_ready_email",
 			queue="short",         
@@ -132,6 +155,9 @@ class JobCard(Document):
 		)
 
 	def send_pft_job(self):
+		#skip during automated tests
+		if frappe.flags.in_test:
+			return
 		pdf = frappe.get_print(self.doctype, self.name, print_format="Job Card Receipt", as_pdf=True)
 		frappe.log_error("1111")
 		# pdf = get_pdf(message)
@@ -152,7 +178,7 @@ class JobCard(Document):
 
 	def cancel_invoice(self):
 		in_name = frappe.db.get_value("Service Invoice",{"job_card":self.name},"name")
-		invoice = frappe.get_doc("Service Invoice",{"job_card":in_name})
+		invoice = frappe.get_doc("Service Invoice",in_name)
 		if invoice:
 			invoice.cancel()
 	
@@ -166,7 +192,6 @@ class JobCard(Document):
 
 	
 
-	
 @frappe.whitelist()
 def show_alert():
 	frappe.publish_realtime("job_ready", {"message": "This Job Card is Ready for Delivery"})
@@ -219,18 +244,24 @@ def get_technician(device_type):
 @frappe.whitelist()
 def reject_job(name,reason):
 	frappe.log_error("reject_job function")
-	rej_doc = frappe.get_doc("Job Card",name)
-	rej_doc.status = "Cancelled"
-	rej_doc.remarks = reason
-	rej_doc.save()
-	frappe.db.commit()
+	frappe.db.set_value("Job Card",name,
+		{
+			"status":"Cancelled",
+			"remarks":reason
+		})
+	# rej_doc = frappe.get_doc("Job Card",name)
+	# rej_doc.status = "Cancelled"
+	# rej_doc.remarks = reason
+	# rej_doc.save()
+	# frappe.db.commit()
 
 @frappe.whitelist()
 def assign_technician(name,technician):
+	frappe.db.set_value("Job Card",name,"assigned_technician",technician)
 	doc = frappe.get_doc("Job Card",name)
-	doc.assigned_technician = technician
-	doc.save()
-	frappe.db.commit()
+	# doc.assigned_technician = technician
+	# doc.save()
+	# frappe.db.commit()
 
 @frappe.whitelist()
 def mark_delivered(doctype,name,fieldname,value):
