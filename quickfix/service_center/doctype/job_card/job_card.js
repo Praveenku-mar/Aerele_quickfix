@@ -134,7 +134,6 @@ frappe.ui.form.on("Job Card", {
         // frappe.call({
         //     method:"quickfix.service_center.doctype.job_card.job_card.back_ground"
         // })
-        console.log("log",frappe.logger("quickfix"))
         frappe.call({
 			method: "frappe.client.get_count",
 			args: {

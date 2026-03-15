@@ -422,7 +422,7 @@ def web_hook(doctype,method):
 
 	frappe.log_error("webhook_id",webhook_id)
 	frappe.enqueue(
-        "quickfix.api.send_webhook",
+        method="quickfix.api.send_webhook",
 		queue="default",
 		timeout=30,
         job_card_name=doctype.name,
@@ -474,7 +474,7 @@ def send_webhook(job_card_name,webhook_id,retry=0):
 
 		if retry < 3:
 			frappe.enqueue(
-				"quickfix.api.send_webhook",
+				method="quickfix.api.send_webhook",
 				job_card_name = job_card_name,
 				enqueue_after_commit=True,
 				queue="default",

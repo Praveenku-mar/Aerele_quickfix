@@ -21,3 +21,16 @@ body :
     "reorder_level":5,
     "is_active":1
 }
+
+
+
+http://quickfix-dev.localhost:8000/api/resource/Spare Part/PH-200-PART-2026-0031
+
+body:
+{
+    is_active:0
+}
+
+
+
+http://quickfix-dev.localhost:8000/api/resource/Spare Part/PH-200-PART-2026-0031

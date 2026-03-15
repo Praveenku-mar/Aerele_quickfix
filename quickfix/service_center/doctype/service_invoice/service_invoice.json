@@ -90,13 +90,18 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-24 13:23:07.160596",
+ "modified": "2026-03-14 22:12:27.992054",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Service Invoice",
  "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
+  {
+   "print": 1,
+   "read": 1,
+   "role": "QF Service Staff"
+  },
   {
    "create": 1,
    "delete": 1,
@@ -108,11 +113,6 @@
    "role": "System Manager",
    "share": 1,
    "write": 1
-  },
-  {
-   "print": 1,
-   "read": 1,
-   "role": "QF Service Staff"
   },
   {
    "cancel": 1,

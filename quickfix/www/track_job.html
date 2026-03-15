@@ -1,0 +1,78 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+<div class="container" style="max-width:600px; margin-top:60px;">
+    
+    <h2 style="margin-bottom:20px;">Track Your Job</h2>
+
+    <form method="GET" action="/track-job">
+    <div class="form-group">
+        <label for="job_id">Select Job ID</label>
+
+        {% set job_cards = frappe.get_list("Job Card", pluck="name",order_by="creation asc") %}
+
+        <select name="job_id" 
+                id="job_id" 
+                class="form-control" 
+                >
+            
+            <option value="">-- Select Job Card --</option>
+
+            {% for jc in job_cards %}
+                <option value="{{ jc }}">{{ jc }}</option>
+            {% endfor %}
+
+        </select>
+        <br>
+         <input type="text" name="phone_number" placeholder="Enter Phone Number" class="form-control">
+
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Track Job
+     </button>
+    </form>
+
+    {% if frappe.form_dict.job_id or frappe.form_dict.phone_number %}
+
+    {% if frappe.form_dict.job_id %}
+        {% set jobs = frappe.get_all(
+            "Job Card",
+            filters={"name": frappe.form_dict.job_id},
+            fields=["name","customer_name","status","payment_status","assigned_technician"]
+        ) %}
+    {% elif frappe.form_dict.phone_number %}
+        {% set jobs = frappe.get_all(
+            "Job Card",
+            filters={"customer_phone": frappe.form_dict.phone_number},
+            fields=["name","customer_name","status","payment_status","assigned_technician"]
+        ) %}
+    {% endif %}
+
+    {% if jobs %}
+
+        <h4>Job Details</h4>
+
+        {% for job in jobs %}
+            <p><strong>Job Card:</strong> {{ job.name }}</p>
+            <p><strong>Customer:</strong> {{ job.customer_name }}</p>
+            <p><strong>Status:</strong> {{ job.status }}</p>
+            <p><strong>Payment Status:</strong> {{ job.payment_status }}</p>
+
+            {% set tech = frappe.db.get_value("Technician", job.assigned_technician, "technician_name") %}
+            <p><strong>Technician:</strong> {{ tech }}</p>
+            <hr>
+        {% endfor %}
+
+    {% else %}
+        <p style="color:red;">No job found.</p>
+    {% endif %}
+
+{% endif %}
+
+</div>
+
+{% endblock %}
+
+

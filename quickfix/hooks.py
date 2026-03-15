@@ -282,13 +282,13 @@ override_whitelisted_methods = {
 
 
 website_route_rules = [
-    {"from_route": "/track-job", "to_route": "track-job"}
+    {"from_route": "/track-job", "to_route": "track_job"}
 ]
 
 standard_portal_menu_items = [
     {
         "title": "Track My Job",
-        "route": "/track-job",
+        "route": "/track_job",
         "reference_doctype": "Job Card",
         "role": "Guest"
     }
