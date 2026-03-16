@@ -60,7 +60,6 @@ class JobCard(Document):
 		if not re.fullmatch(r"\d{10}",phone):
 			frappe.throw("Customer phone number must contain exactly 10 digits.")
 
-	@frappe.whitelist()
 	def check_technician(self):
 
 		# if not self.assigned_technician:
@@ -139,7 +138,6 @@ class JobCard(Document):
 		invoice.total_amount = self.final_amount
 		invoice.payment_status = "Unpaid"
 		invoice.insert(ignore_permissions=True)
-		invoice.submit()
 
 	def notify_job_complete(self):
 		# frappe.publish_realtime(
@@ -249,17 +247,17 @@ def get_technician(device_type):
 		},pluck="name"
 	)
 
-# @frappe.whitelist()
-# def check_technician(device_type,technician):
-# 	exits = frappe.db.exists("Technician",
-# 		{
-# 			"name":technician,
-# 			"specialization":device_type,
-# 			"status":"Active"
-# 		}
-# 	)
-# 	if not exits:
-# 		frappe.show_alert("Technician specialization not matching with device type or is on Leave.")
+@frappe.whitelist()
+def check_technician(device_type,technician):
+	exits = frappe.db.exists("Technician",
+		{
+			"name":technician,
+			"specialization":device_type,
+			"status":"Active"
+		}
+	)
+	if not exits:
+		frappe.show_alert("Technician specialization not matching with device type or is on Leave.")
 
 
 
@@ -267,25 +265,24 @@ def get_technician(device_type):
 
 @frappe.whitelist()
 def reject_job(name,reason):
-	frappe.log_error("reject_job function")
 	frappe.db.set_value("Job Card",name,
 		{
 			"status":"Cancelled",
 			"remarks":reason
 		})
-	# rej_doc = frappe.get_doc("Job Card",name)
-	# rej_doc.status = "Cancelled"
-	# rej_doc.remarks = reason
-	# rej_doc.save()
-	# frappe.db.commit()
+	# doc = frappe.get_doc("Job Card",name)
+	# doc.status = "Ready For Delivery"
+	# doc.save()
+	# doc.submit()
+	# doc.status = "Cancelled"
+	# doc.cancel()
+
+
 
 @frappe.whitelist()
 def assign_technician(name,technician):
 	frappe.db.set_value("Job Card",name,"assigned_technician",technician)
-	doc = frappe.get_doc("Job Card",name)
-	# doc.assigned_technician = technician
-	# doc.save()
-	# frappe.db.commit()
+	
 
 @frappe.whitelist()
 def mark_delivered(doctype,name,fieldname,value):

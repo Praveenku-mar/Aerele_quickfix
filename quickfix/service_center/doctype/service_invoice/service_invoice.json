@@ -90,7 +90,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-03-14 22:12:27.992054",
+ "modified": "2026-03-16 18:19:07.282936",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Service Invoice",
@@ -125,6 +125,19 @@
    "report": 1,
    "role": "QF Manager",
    "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Guest",
    "share": 1,
    "submit": 1,
    "write": 1

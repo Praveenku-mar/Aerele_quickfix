@@ -72,6 +72,7 @@ frappe.ui.form.on("Job Card", {
                         }
                     });
                 }
+                
             });
             dialog.show();
         }).addClass("btn-danger");
@@ -111,17 +112,21 @@ frappe.ui.form.on("Job Card", {
                             // freeze: true,
                             // freeze_message : "Reassigning Technician......",
                             callback: function(r){
+                                // frm.reload_doc()
                                 if(!r.exc){
                                     frappe.msgprint({
                                         title:"Success",
                                         message:"Reassigned Technician",
                                         indicator:"green"
-                                    });
+                                  });
+            
                                 }
-                                
+                                  
                             }
                         });
                         frm.trigger("assigned_technician")
+                        frm.reload_doc()
+                      
                     }   
                 )  
             }
@@ -144,14 +149,17 @@ frappe.ui.form.on("Job Card", {
 				frappe.msgprint(count);
 			},
 		});
-        frm.call('show_alert')
-        frappe.realtime.on("job_ready", (data) => {
-            console.log("out")
-                frappe.show_alert({
-                    message:("Job is Ready"),
-                    indicator: "green"
-                });
-        });
+        if(frm.doc.status == "Ready For Delivery"){
+            frm.call('show_alert')
+            frappe.realtime.on("job_ready", (data) => {
+                console.log("out")
+                    frappe.show_alert({
+                        message:("Job is Ready"),
+                        indicator: "green"
+                    });
+            });
+        }
+
         frappe.db.get_single_value("QuickFix Settings", "default_labour_charge")
             .then(value => {
                 const labour = value || 0
@@ -170,7 +178,12 @@ frappe.ui.form.on("Job Card", {
         })
     },
     assigned_technician(frm){
-        frm.call("check_technician");
+        frappe.call({method:"quickfix.service_center.doctype.job_card.job_card.check_technician",
+            args:{
+                device_type:frm.doc.device_type,
+                technician : frm.doc.assigned_technician
+            }
+        })
     },
     labour_charge(frm) {
         calculate_total_amount(frm)
