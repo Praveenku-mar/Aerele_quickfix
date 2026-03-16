@@ -151,7 +151,6 @@ class TestJobCard(FrappeTestCase):
 		self.assertEqual(self.job.docstatus,0)
 
 
-	#Phone Validation Boundary cases
 	def test_phone_validation(self):
 		invalid_numbers=[
 			"12344",
@@ -167,7 +166,6 @@ class TestJobCard(FrappeTestCase):
 		self.assertTrue(frappe.db.exists("Job Card",job.name))
 
 
-	#Spare part selling price constraint
 	def test_spare_part_price_constraints(self):
 		with self.assertRaises(frappe.ValidationError):
 			spare_equal = make_spare_part(part_code="_equal_test",
@@ -191,7 +189,6 @@ class TestJobCard(FrappeTestCase):
 
 		self.assertTrue(spare_valid.name)
 
-	#Final Amount Computation
 	def test_final_amount_computation(self):
 		job = make_job_card()
 		expected_parts_total = 1 * self.job.parts_used[0].unit_price
@@ -200,10 +197,9 @@ class TestJobCard(FrappeTestCase):
 		self.assertEqual(job.parts_total, expected_parts_total)
 		self.assertEqual(job.final_amount,expected_final_amount)
 
-	#Status Transition Guard
 	def test_in_repair_status_transition_guard(self):
 		self.job.status = "In Repair"
-		self.job.assigned_technician = None   # deliberately remove the technician
+		self.job.assigned_technician = None   
  
 		with self.assertRaises(frappe.ValidationError):
 			self.job.save()
@@ -400,7 +396,7 @@ class TestJobCard(FrappeTestCase):
 
 		self.assertFalse(frappe.db.exists("Job Card",self.job.name))
 
-		
+
 	# @patch("frappe.sendmail")
 	# def test_send_mail(self, mock_mail):
 	# 	frappe.flags.in_test = False

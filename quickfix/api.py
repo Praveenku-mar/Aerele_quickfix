@@ -194,15 +194,14 @@ def get_job_cards_safe():
 
 @frappe.whitelist()
 def custom_get_count(doctype,filters=None, debug=False, cache=False):
-	print("12345")
-	frappe.log_error("21345678")
-	doc = frappe.new_doc("Audit Log")
-	doc.doctype_name=doctype
-	doc.action="count_queried"
-	doc.timestamp=now()
-	doc.user=frappe.session.user
-	doc.insert(ignore_permissions=True)
-	frappe.db.commit()
+	# frappe.log_error("21345678")
+	# doc = frappe.new_doc("Audit Log")
+	# doc.doctype_name=doctype
+	# doc.action="count_queried"
+	# doc.timestamp=now()
+	# doc.user=frappe.session.user
+	# doc.insert(ignore_permissions=True)
+	# frappe.db.commit()
 	from frappe.client import get_count
 	return get_count(doctype, filters, debug, cache)
 
@@ -470,7 +469,7 @@ def send_webhook(job_card_name,webhook_id,retry=0):
 		frappe.db.commit()
 
 	except Exception as e:
-		frappe.log_error(f"webhook failed: {e}","Webhook Error")
+		frappe.log_error("Webhook Error",f"webhook failed: {e}")
 
 		if retry < 3:
 			frappe.enqueue(
@@ -479,10 +478,9 @@ def send_webhook(job_card_name,webhook_id,retry=0):
 				enqueue_after_commit=True,
 				queue="default",
 				timeout=300,
-				delay=60
+				webhook_id=webhook_id,
+				retry = retry+1
 			)
-
-
 
 
 
@@ -527,6 +525,10 @@ def payment_webhook():
 	job.paid_amount = amount
 	job.save(ignore_permissions=True)
 
+	invoice = frappe.get_doc("Service Invoice",{"job_card":ref})
+	invoice.payment_status = "Paid"
+	invoice.save()
+	invoice.submit()
 	# 6. Log to Audit Log
 	frappe.get_doc({
 		"doctype": "Audit Log",
