@@ -1,7 +1,11 @@
 ### QuickFix
-## 🎥 QuickFix Demo
+## 🎥 Demo
 
-[![Watch the Demo](https://img.youtube.com/vi/demo/0.jpg)](https://drive.google.com/file/d/1xpmkwVCKKhWaqKRnU9ch6cIao0ApJJOG/view)
+This video demonstrates the QuickFix service center workflow including
+job card creation, technician assignment, spare parts usage, and revenue tracking.
+
+🔗 Watch the demo:
+https://drive.google.com/file/d/1xpmkwVCKKhWaqKRnU9ch6cIao0ApJJOG/view
 ## Configuration Files Explanation
 
 `site_config.json` stores configuration values specific to an individual site, such as database name, credentials, and developer_mode.  
