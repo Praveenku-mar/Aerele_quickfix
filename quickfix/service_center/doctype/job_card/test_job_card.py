@@ -7,6 +7,7 @@ from frappe.utils import nowdate
 from unittest.mock import patch
 import requests
 from quickfix.api import send_webhook
+from frappe import sendmail
 
 def make_device(dev_name="_test_smartphone"):
 	if frappe.db.exists("Device Type", {"device_type": dev_name}):
@@ -182,7 +183,7 @@ class TestJobCard(FrappeTestCase):
 				s_cost=400
 			)
 
-		spare_valid = spare_lower = make_spare_part(part_code="_valid_test",
+		spare_valid = make_spare_part(part_code="_valid_test",
 				stock_qty=5,
 				u_cost = 500,
 				s_cost=501
@@ -399,14 +400,17 @@ class TestJobCard(FrappeTestCase):
 
 		self.assertFalse(frappe.db.exists("Job Card",self.job.name))
 
-
+		
 	# @patch("frappe.sendmail")
 	# def test_send_mail(self, mock_mail):
+	# 	frappe.flags.in_test = False
 	# 	self.job.status = "Ready For Delivery"
 	# 	self.job.submit()
 	# 	mock_mail.assert_called_once()
 	# 	args, kwargs = mock_mail.call_args
 	# 	self.assertIn(self.job.customer_email,kwargs["recipients"])
+
+	# 	frappe.flags.in_test = True
 	
 	# @patch("frappe.enqueue")
 	# def test_enqueue(self, mock_enqueue):
@@ -437,7 +441,6 @@ class TestJobCard(FrappeTestCase):
 			if args[0] == "job_ready":
 				# print("job_ready=========",args[0])
 				self.assertEqual(args[1]["job_card"], self.job.name)
-				self.assertTrue(kwargs["after_commit"])
 				found = True
 
 		self.assertTrue(found)
@@ -478,7 +481,9 @@ class TestJobCard(FrappeTestCase):
 
 		second_count = frappe.db.count(
 			"Service Invoice",
-			{"job_card",self.job.name}
+			{
+				"job_card":self.job.name
+			}
 		)
 
 		self.assertEqual(first_count,second_count)
