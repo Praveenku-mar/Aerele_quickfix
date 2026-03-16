@@ -156,8 +156,7 @@ class JobCard(Document):
 		# )
 		frappe.publish_realtime(
 		"job_ready",
-		{"job_card": self.name},
-		after_commit=True
+		{"job_card": self.name}
 	)
 		
 
