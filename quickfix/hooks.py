@@ -159,7 +159,7 @@ permission_query_conditions = {
 
 has_permission = {
 	# "Event": "frappe.desk.doctype.event.event.has_permission",
-    "Job Card":"quickfix.service_center.doctype.service_invoice.service_invoice.check_has_permission"
+    "Service Invoice":"quickfix.service_center.doctype.service_invoice.service_invoice.check_has_permission"
 }
 
 # # DocType Class

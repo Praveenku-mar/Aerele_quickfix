@@ -160,8 +160,8 @@ class JobCard(Document):
 
 	def send_job_ready_mail(self):
 		#skip during automated tests
-		# if frappe.flags.in_test:
-		# 	return
+		if frappe.flags.in_test:
+			return
 		frappe.enqueue(
 			method="quickfix.api.send_job_ready_email",
 			queue="short",         
@@ -173,7 +173,6 @@ class JobCard(Document):
 	def send_pft_job(self):
 		#skip during automated tests
 		if frappe.flags.in_test:
-			# pdf = b"test pdf"
 			return
 
 		else:
