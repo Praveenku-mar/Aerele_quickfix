@@ -160,8 +160,8 @@ class JobCard(Document):
 
 	def send_job_ready_mail(self):
 		#skip during automated tests
-		if frappe.flags.in_test:
-			return
+		# if frappe.flags.in_test:
+		# 	return
 		frappe.enqueue(
 			method="quickfix.api.send_job_ready_email",
 			queue="short",         
@@ -178,8 +178,6 @@ class JobCard(Document):
 
 		else:
 			pdf = frappe.get_print(self.doctype, self.name, print_format="Job Card Receipt", as_pdf=True)
-		frappe.log_error("1111")
-		# pdf = get_pdf(message)
 		frappe.sendmail(recipients=[self.customer_email],
 			subject="Job Card Submitted",
 			message="Please find the attached Job Card PDF.",
@@ -197,7 +195,6 @@ class JobCard(Document):
 
 	def cancel_invoice(self):
 		invoice = frappe.get_doc("Service Invoice",{"job_card":self.name})
-		# invoice = frappe.get_doc("Service Invoice",in_name)
 
 		if not invoice:
 			return 

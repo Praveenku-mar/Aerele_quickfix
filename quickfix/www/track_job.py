@@ -1,7 +1,6 @@
 import frappe
 
 def get_context(context):
-    print("context---------")
     context.title = "Track Job Status"
     context.description = "Track your device repair job status"
     context.og_title = "Track Job - QuickFix"

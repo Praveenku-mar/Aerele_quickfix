@@ -443,7 +443,6 @@ def job_card():
 
         frappe.db.commit()
 
-        print("All Job Cards Inserted Successfully")
         return "Successfully"
 
 

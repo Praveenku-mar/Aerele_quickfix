@@ -169,7 +169,6 @@ def get_job_cards_unsafe():
 @frappe.whitelist()
 def get_job_cards_safe():
 	user = frappe.session.user
-	frappe.log_error(user)
 	roles = frappe.get_roles(user)
 
 	rows = frappe.get_list(
@@ -183,7 +182,6 @@ def get_job_cards_safe():
 			"assigned_technician"
 		]
 	)
-	frappe.log_error("1111",rows)
 	if "QF Manager" not in roles:
 		for row in rows:
 			row.pop("customer_phone", None)
@@ -194,14 +192,19 @@ def get_job_cards_safe():
 
 @frappe.whitelist()
 def custom_get_count(doctype,filters=None, debug=False, cache=False):
-	# frappe.log_error("21345678")
+	frappe.get_doc({
+		"doctype":"Audit Log",
+		"doctype_name":doctype,
+		"action":"count_quired",
+		"timestamp":now(),
+		"user":frappe.session.user
+	}).insert(ignore_permissions=True)
 	# doc = frappe.new_doc("Audit Log")
 	# doc.doctype_name=doctype
 	# doc.action="count_queried"
 	# doc.timestamp=now()
 	# doc.user=frappe.session.user
 	# doc.insert(ignore_permissions=True)
-	# frappe.db.commit()
 	from frappe.client import get_count
 	return get_count(doctype, filters, debug, cache)
 
@@ -258,7 +261,7 @@ def bulk_cancelled_loop():
 	frappe.db.commit()
 
 	end = time.time()
-	print(f"Time :{end-start}'s")
+
 
 @frappe.whitelist()
 def bulk_cancelled():
@@ -273,8 +276,6 @@ def bulk_cancelled():
 	)
 	frappe.db.commit()
 	end = time.time()
-	print(f"Time :{end-start}'s")
-
 
 @frappe.whitelist()
 def insert_audit_logs_bulk(n: int = 500) -> float:
@@ -317,7 +318,6 @@ def insert_audit_logs_bulk(n: int = 500) -> float:
 	)
 	frappe.db.commit()
 	end = time.time()
-	print(f"Time :{end-start}'s")
 
 
 @frappe.whitelist()
@@ -334,7 +334,6 @@ def bulk_insert_loop():
 	frappe.db.commit()
 
 	end = time.time()
-	print(f"Time :{end-start}'s")
 
 
 
@@ -362,7 +361,6 @@ def bulk_insert_loop():
 @frappe.whitelist(allow_guest=True)
 def get_job_summary():
 	job_card = frappe.form_dict.get("job_card")
-	print(job_card)
 	if not job_card:
 		frappe.response['http_status_code'] = 404
 		return {"error":"Job Card name Required"}
@@ -437,14 +435,17 @@ def send_webhook(job_card_name,webhook_id,retry=0):
 	if not settings.webhook_url:
 		return
 
-	doc = frappe.get_doc("Job Card",job_card_name)
-
+	doc = frappe.db.get_value("Job Card",job_card_name,["customer_name","final_amount"],as_dict=True)
+	if not doc:
+		return
 	payload = {
 		"event":"job_submitted",
-		"job_card":doc.name,
+		"job_card":job_card_name,
 		"customer":doc.customer_name,
 		"amount":doc.final_amount
 	}
+
+
 
 	if frappe.db.exists("Audit Log",{"webhook_id":webhook_id}):
 		return
@@ -501,8 +502,6 @@ def payment_webhook():
 	).hexdigest()
 
 
-	print("==================================",expected)
-	print("=================================",signature)
 	if not signature or not hmac.compare_digest(expected, signature):
 		frappe.throw("Invalid signature", frappe.AuthenticationError)
 
@@ -527,7 +526,7 @@ def payment_webhook():
 
 	invoice = frappe.get_doc("Service Invoice",{"job_card":ref})
 	invoice.payment_status = "Paid"
-	invoice.save()
+	invoice.save(ignore_permissions=True)
 	invoice.submit()
 	# 6. Log to Audit Log
 	frappe.get_doc({

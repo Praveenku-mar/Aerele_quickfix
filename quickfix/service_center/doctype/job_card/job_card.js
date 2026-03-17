@@ -7,7 +7,6 @@ frappe.ui.form.on("Job Card", {
             frm.set_df_property("customer_phone", "hidden", 1);
         }
         if(frm.doc.status){
-            // console.log("condition")
             let color_map ={
                 "Diagnosis" : "orange",
                 "In Repair":"blue",
@@ -22,7 +21,6 @@ frappe.ui.form.on("Job Card", {
         }
 
         if(frm.doc.status === "Ready For Delivery" && frm.doc.docstatus === 1 ){
-            // console.log("Button")
             frm.add_custom_button("Mark as Delivered",()=>{
                 // frm.set_value("status","Delivered");
             });
@@ -31,7 +29,6 @@ frappe.ui.form.on("Job Card", {
 
         //Set shop_name
         if(frappe.boot.quickfix_shop_name){
-            console.log("set intro")
             frm.set_intro(
                 `Service Center: ${frappe.boot.quickfix_shop_name}`,
                 "blue"
@@ -41,8 +38,6 @@ frappe.ui.form.on("Job Card", {
         //Reject job
         if(frm.doc.status != "Cancelled"){
         frm.add_custom_button(("Reject Job"), ()=>{
-            console.log("reject")
-            console.log(frm.doc.device_type)
             let dialog = new frappe.ui.Dialog({
                 title:"Reject Job",
                 fields:[
@@ -152,7 +147,6 @@ frappe.ui.form.on("Job Card", {
         if(frm.doc.status == "Ready For Delivery"){
             frm.call('show_alert')
             frappe.realtime.on("job_ready", (data) => {
-                console.log("out")
                     frappe.show_alert({
                         message:("Job is Ready"),
                         indicator: "green"
@@ -166,7 +160,6 @@ frappe.ui.form.on("Job Card", {
                 frm.set_value("labour_charge", labour)
                 calculate_total_amount(frm)
             });
-        console.log("onload")
         frappe.call({
             method:"quickfix.service_center.doctype.job_card.job_card.show_alert"
         });
@@ -197,9 +190,7 @@ frappe.ui.form.on("Job Card", {
             },
             callback: function(r) {
                 if (r.message) {
-                    console.log(r.message);
                     let technician = r.message
-                    console.log(technician)
                     frm.set_query("assigned_technician", () =>{
                          return {
                         filters: {
@@ -223,10 +214,7 @@ frappe.ui.form.on("Part Usage Entry", {
 })
 
 function calculate_row_total(frm, cdt, cdn) {
-    console.log("111111111");
     const row = locals[cdt][cdn]
-    console.log("222222222222");
-    console.log(row);
 
     total_price = (row.quantity || 0) * (row.unit_price || 0)
     frappe.model.set_value(cdt,cdn,"total_price",total_price)

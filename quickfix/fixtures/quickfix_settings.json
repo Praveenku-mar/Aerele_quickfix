@@ -8,6 +8,7 @@
   "manager_email": "praveensekar223@gmail.com",
   "modified": "2026-02-25 18:05:20.892851",
   "name": "QuickFix Settings",
-  "shop_name": "QuickFix"
+  "shop_name": "QuickFix",
+  "webhook_url": null
  }
 ]
