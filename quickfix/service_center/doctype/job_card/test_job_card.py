@@ -123,7 +123,6 @@ class TestJobCard(FrappeTestCase):
 
 	def test_job_card_submit(self):
 		self.job.status = "Ready For Delivery"
-		# print(nowdate())
 		self.job.delivery_date = nowdate()
 		self.job.save()
 		self.job.submit()
@@ -132,7 +131,6 @@ class TestJobCard(FrappeTestCase):
 
 	def test_invoice_creation(self):
 		self.job.status = "Ready For Delivery"
-		# print(nowdate())
 		self.job.delivery_date = nowdate()
 		self.job.save()
 		self.job.submit()
@@ -144,7 +142,7 @@ class TestJobCard(FrappeTestCase):
     	)
 		invoice = frappe.get_doc("Service Invoice",invoice_name)
 		self.assertIsNotNone(invoice)
-		self.assertEqual(invoice.docstatus,1)
+		self.assertEqual(invoice.docstatus,0)
 
 	def test_happy_path_insert(self):
 		self.assertTrue(frappe.db.exists("Job Card",self.job.name))
@@ -345,7 +343,6 @@ class TestJobCard(FrappeTestCase):
 
 		self.job.status = "Ready For Delivery"
 		self.job.submit()
-		# print("job status",self.job.docstatus)
 		self.assertEqual(self.job.docstatus,1)
 		
 		self.job.cancel()
@@ -363,7 +360,7 @@ class TestJobCard(FrappeTestCase):
         	{"job_card": self.job.name},
         	"name"
     	)
-
+		invoice.submit()
 		self.assertEqual(invoice.docstatus,1)
 
 		self.job.cancel()
@@ -397,16 +394,16 @@ class TestJobCard(FrappeTestCase):
 		self.assertFalse(frappe.db.exists("Job Card",self.job.name))
 
 
-	# @patch("frappe.sendmail")
-	# def test_send_mail(self, mock_mail):
-	# 	frappe.flags.in_test = False
-	# 	self.job.status = "Ready For Delivery"
-	# 	self.job.submit()
-	# 	mock_mail.assert_called_once()
-	# 	args, kwargs = mock_mail.call_args
-	# 	self.assertIn(self.job.customer_email,kwargs["recipients"])
+	@patch("frappe.sendmail")
+	def test_send_mail(self, mock_mail):
+		frappe.flags.in_test = False
+		self.job.status = "Ready For Delivery"
+		self.job.submit()
+		mock_mail.assert_called_once()
+		args, kwargs = mock_mail.call_args
+		self.assertIn(self.job.customer_email,kwargs["recipients"])
 
-	# 	frappe.flags.in_test = True
+		frappe.flags.in_test = True
 	
 	# @patch("frappe.enqueue")
 	# def test_enqueue(self, mock_enqueue):
@@ -433,9 +430,7 @@ class TestJobCard(FrappeTestCase):
 
 		for call in mock_publish.call_args_list:
 			args, kwargs = call
-			# print("args=========",args)
 			if args[0] == "job_ready":
-				# print("job_ready=========",args[0])
 				self.assertEqual(args[1]["job_card"], self.job.name)
 				found = True
 

@@ -173,13 +173,10 @@ class JobCard(Document):
 	def send_pft_job(self):
 		#skip during automated tests
 		if frappe.flags.in_test:
-			# pdf = b"test pdf"
 			return
 
 		else:
 			pdf = frappe.get_print(self.doctype, self.name, print_format="Job Card Receipt", as_pdf=True)
-		frappe.log_error("1111")
-		# pdf = get_pdf(message)
 		frappe.sendmail(recipients=[self.customer_email],
 			subject="Job Card Submitted",
 			message="Please find the attached Job Card PDF.",
@@ -197,7 +194,6 @@ class JobCard(Document):
 
 	def cancel_invoice(self):
 		invoice = frappe.get_doc("Service Invoice",{"job_card":self.name})
-		# invoice = frappe.get_doc("Service Invoice",in_name)
 
 		if not invoice:
 			return 

@@ -26,7 +26,8 @@ fixtures = [
     {"dt":"Custom Field"},
     {"dt":"Property Setter"},
     {"dt":"Workspace"},
-    {"dt":"QuickFix Settings"}
+    {"dt":"QuickFix Settings"},
+    {"dt":"Document Naming Rule"}
 ]
 
 extend_bootinfo = "quickfix.extend_bootinfo.extend_bootinfo"
@@ -105,8 +106,13 @@ doctype_list_js = {
 
 # # add methods and filters to jinja environment
 jinja = {
-	"methods": "quickfix.utils.get_shop_name",
-	"filters": "quickfix.utils.format_job_id"
+    "methods": [
+        "quickfix.utils.get_shop_name",
+        "quickfix.utils.generate_qr_code"
+    ],
+    "filters": [
+        "quickfix.utils.format_job_id"
+    ]
 }
 
 # # Installation
@@ -153,7 +159,7 @@ permission_query_conditions = {
 
 has_permission = {
 	# "Event": "frappe.desk.doctype.event.event.has_permission",
-    "Job Card":"quickfix.service_center.doctype.service_invoice.service_invoice.check_has_permission"
+    "Service Invoice":"quickfix.service_center.doctype.service_invoice.service_invoice.check_has_permission"
 }
 
 # # DocType Class

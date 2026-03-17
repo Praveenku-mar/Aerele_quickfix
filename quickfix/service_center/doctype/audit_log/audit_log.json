@@ -40,9 +40,9 @@
   },
   {
    "fieldname": "document_id",
-   "fieldtype": "Dynamic Link",
+   "fieldtype": "Data",
    "label": "Document ID",
-   "options": "doctype_name"
+   "read_only": 1
   },
   {
    "fieldname": "timestamp",
@@ -60,7 +60,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-03-16 12:54:24.877875",
+ "modified": "2026-03-17 12:56:55.444524",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Audit Log",
