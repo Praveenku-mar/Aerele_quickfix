@@ -330,13 +330,13 @@ The result always reflects the current data in the database.
 Prepared Reports can become **stale** because they show the data from the time the report was generated.  
 If new records are added or updated later, the prepared report will not include those changes.
 ---
-26 . Caching Risk
+## 26 . Caching Risk
 
 If the underlying data changes after the report is prepared, the user still sees the **old stored result**.  
 The report will only show updated data after it is prepared again.
 
 ---
-27. Avoid `frappe.get_all()` Inside Jinja Templates
+## 27. Avoid `frappe.get_all()` Inside Jinja Templates
 
 Calling `frappe.get_all()` directly inside a Jinja template is bad practice.  
 Templates should only display data, not run database queries.  
@@ -424,9 +424,9 @@ for jc in job_cards:
 
 ## Answer:
 
-job_card = frappe.get_all("Job Card", fields=["name","assigned_technician"])
+job_card = frappe.get_all("Job Card", fields=["name","assigned_technician"],as_dict=True)
 for job in job_card:
-    tech_name,tech_phone = frappe.db.get_value("Technician",job,fields=["technician_name","phone"])
+    tech_name,tech_phone = frappe.db.get_value("Technician",job.assigned_technician,fields=["technician_name","phone"])
     print(tech_name,tech_phone)
 
 ---
